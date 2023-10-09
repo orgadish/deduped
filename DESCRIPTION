@@ -1,6 +1,6 @@
 Package: deduped
 Type: Package
-Title: Helper for making deduplicated functions
+Title: Making Deduplicated Functions
 Version: 0.1.0
 Author: Or Gadish
 Maintainer: Or Gadish <orgadish@gmail.com>
