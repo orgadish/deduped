@@ -3,11 +3,11 @@ test_that("dedup(f) runs only on deduplicated values", {
   f <- function(ii) for(i in ii) test_dedup.ncalls <<- test_dedup.ncalls + 1
 
   x <- c(1, 1, 1, 2, 3)
-  dedup(f)(x)
+  deduped(f)(x)
   expect_equal(test_dedup.ncalls, 3)
 
   test_dedup.ncalls <<- 0
   x <- 1:5
-  dedup(f)(x)
+  deduped(f)(x)
   expect_equal(test_dedup.ncalls, 5)
 })

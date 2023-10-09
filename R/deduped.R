@@ -16,9 +16,9 @@
 #' long_func <- function(x) for(i in x) {Sys.sleep(0.001)}
 #'
 #' system.time({y <- long_func(large_x)})
-#' system.time({y2 <- dedup(long_func)(large_x)})
+#' system.time({y2 <- deduped(long_func)(large_x)})
 #' all(y == y2)
-dedup <- function(f) {
+deduped <- function(f) {
   function(x, ...) {
     ux <- collapse::funique(x)
     f(ux, ...)[fastmatch::fmatch(x, ux)]
