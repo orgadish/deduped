@@ -1,0 +1,18 @@
+Package: deduped
+Type: Package
+Title: Helper for making deduplicated functions
+Version: 0.1.0
+Author: Or Gadish
+Maintainer: Or Gadish <orgadish@gmail.com>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    collapse,
+    fastmatch
+RoxygenNote: 7.2.3
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

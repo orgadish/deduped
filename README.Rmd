@@ -1,0 +1,48 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# deduped
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of `deduped` is to provide a utility function that makes it easier to speed up functions that are commonly run on vectors with significant duplication.
+
+## Installation
+
+You can install the development version of deduped like so:
+
+``` r
+if(!requireNamespace("remotes")) install.packages("remotes")
+
+remotes::install_github("orgadish/dedup")
+```
+
+## Example
+
+```{r example}
+library(deduped)
+x <- sample(LETTERS, 10)
+x
+
+large_x <- sample(rep(x, 100))
+length(large_x)
+
+slow_func <- function(x) for(i in x) {Sys.sleep(0.001)}
+
+system.time({y <- slow_func(large_x)})
+system.time({y2 <- dedup(slow_func)(large_x)})
+all(y == y2)
+```
