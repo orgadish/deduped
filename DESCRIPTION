@@ -1,7 +1,7 @@
 Package: deduped
 Type: Package
 Title: Making Deduplicated Functions
-Version: 0.1.0
+Version: 0.1.1
 Author: Or Gadish
 Maintainer: Or Gadish <orgadish@gmail.com>
 Description: Contains one main function `deduped` that returns a 
