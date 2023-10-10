@@ -1,11 +1,13 @@
 Package: deduped
 Type: Package
-Title: Making Deduplicated Functions
+Title: Making "Deduplicated" Functions
 Version: 0.1.1
 Author: Or Gadish
 Maintainer: Or Gadish <orgadish@gmail.com>
 Description: Contains one main function `deduped` that returns a 
-    function which acts on a deduplicated version of the first input.
+    function that acts on the unique values of the first input
+    and expands the results back. This can significantly speed
+    up certain slow iterative functions.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
