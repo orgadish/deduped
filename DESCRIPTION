@@ -1,10 +1,10 @@
 Package: deduped
 Type: Package
 Title: Making "Deduplicated" Functions
-Version: 0.1.1
+Version: 0.1.2
 Author: Or Gadish
 Maintainer: Or Gadish <orgadish@gmail.com>
-Description: Contains one main function `deduped` that returns a 
+Description: Contains one main function `deduped()` that returns a 
     function that acts on the unique values of the first input
     and expands the results back. This can significantly speed
     up certain slow iterative functions.
@@ -18,5 +18,6 @@ RoxygenNote: 7.2.3
 Suggests: 
     dplyr,
     readr,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    withr
 Config/testthat/edition: 3

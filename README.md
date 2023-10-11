@@ -7,8 +7,8 @@
 <!-- badges: end -->
 
 The goal of `deduped` is to provide one main utility function
-(`deduped`) that makes it easier to speed up functions that are commonly
-run on vectors with significant duplication.
+(`deduped()`) that makes it easier to speed up functions that are
+commonly run on vectors with significant duplication.
 
 One particular use case that I come across a lot is when using
 `basename` and `dirname` on the `file_path` column after reading
@@ -33,7 +33,7 @@ library(deduped)
 
 x <- sample(LETTERS, 10)
 x
-#>  [1] "X" "F" "P" "L" "N" "R" "T" "D" "I" "W"
+#>  [1] "O" "B" "J" "C" "M" "E" "P" "G" "Y" "F"
 
 large_x <- sample(rep(x, 100))
 length(large_x)
@@ -43,10 +43,10 @@ slow_func <- function(x) for(i in x) {Sys.sleep(0.001)}
 
 system.time({y <- slow_func(large_x)})
 #>    user  system elapsed 
-#>   0.014   0.009   1.205
+#>   0.020   0.012   1.228
 system.time({y2 <- deduped(slow_func)(large_x)})
 #>    user  system elapsed 
-#>   0.096   0.010   0.127
+#>   0.132   0.017   0.169
 all(y == y2)
 #> [1] TRUE
 ```
@@ -98,10 +98,10 @@ large_x
 
 system.time({y1 <- dplyr::mutate(large_x, file_name = basename(file_path))})
 #>    user  system elapsed 
-#>   0.083   0.001   0.085
+#>   0.092   0.001   0.094
 system.time({y2 <- dplyr::mutate(large_x, file_name = deduped(basename)(file_path))})
 #>    user  system elapsed 
-#>   0.007   0.000   0.007
+#>   0.007   0.001   0.007
 
 all.equal(y1, y2)
 #> [1] TRUE

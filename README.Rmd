@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of `deduped` is to provide one main utility function (`deduped`) that makes it easier to speed up functions that are commonly run on vectors with significant duplication.
+The goal of `deduped` is to provide one main utility function (`deduped()`) that makes it easier to speed up functions that are commonly run on vectors with significant duplication.
 
 One particular use case that I come across a lot is when using `basename` and `dirname` on the `file_path` column after reading multiple CSVs (e.g. with `readr::read_csv(..., id="file_path")`). `basename` and `dirname` are surprisingly slow (especially on Windows), and most of the column is duplicated.
 

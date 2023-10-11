@@ -1,5 +1,6 @@
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
+── R CMD check results ─────────────────────── deduped 0.1.2 ────
+Duration: 13.4s
 
-* This is a new release.
+0 errors ✔ | 0 warnings ✔ | 0 notes ✔
