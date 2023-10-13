@@ -1,4 +1,4 @@
-test_that("dedup(f) runs only on deduplicated values", {
+test_that("deduped(f) runs only on deduplicated values", {
   get_ncalls <- function() as.integer(Sys.getenv("ncalls"))
   increment_ncalls <- function() Sys.setenv(ncalls = get_ncalls() + 1L)
 
@@ -21,4 +21,10 @@ test_that("dedup(f) runs only on deduplicated values", {
       expect_equal(get_ncalls(), 5)
     }
   )
+})
+
+test_that("deduped(f) returns the data in the same order", {
+  x <- c(1, 3, 1, 2, 2, 1)
+  pass_through <- \(i) i
+  expect_equal(deduped(pass_through)(x), x)
 })
