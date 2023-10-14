@@ -1,3 +1,8 @@
-# deduped 0.1.0
+# deduped 0.1.3
 
-* Initial CRAN submission.
+* Added new `deduped_map()`.
+
+
+# deduped 0.1.2
+
+* Initial successful CRAN submission.

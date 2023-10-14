@@ -1,7 +1,7 @@
 Package: deduped
 Type: Package
 Title: Making "Deduplicated" Functions
-Version: 0.1.2
+Version: 0.1.3
 Author: Or Gadish
 Maintainer: Or Gadish <orgadish@gmail.com>
 Description: Contains one main function `deduped()` that returns a 
@@ -17,6 +17,8 @@ Imports:
 RoxygenNote: 7.2.3
 Suggests: 
     dplyr,
+    hashr,
+    purrr,
     readr,
     testthat (>= 3.0.0),
     withr
