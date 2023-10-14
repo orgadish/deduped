@@ -35,14 +35,11 @@ deduped_map <- function(.x, .f, ..., .progress = FALSE) {
 }
 
 
-check_map_pkgs <- function(debug=NULL) {
-
+check_map_pkgs <- function() {
   not_installed <- c(
     if(!requireNamespace("hashr", quietly = TRUE)) "hashr",
     if(!requireNamespace("purrr", quietly = TRUE)) "purrr"
   )
-
-  if(!is.null(debug)) not_installed <- debug
 
   if(length(not_installed) == 0) return(invisible())
 
