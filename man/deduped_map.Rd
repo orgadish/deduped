@@ -41,7 +41,7 @@ a basic progress bar, use a string to give it a name, or see
 \link[purrr]{progress_bars} for more details.}
 }
 \description{
-Acts like `purrr::map` but only on unique elements
+Acts like `purrr::map()` but only on unique elements.
 }
 \examples{
 slow_func <- function(x) for(i in x) {Sys.sleep(0.001)}

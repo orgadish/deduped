@@ -1,7 +1,7 @@
 #' Apply a function to each unique element of a vector
 #'
 #' @description
-#' Acts like `purrr::map` but only on unique elements
+#' Acts like `purrr::map()` but only on unique elements.
 #'
 #' @inheritParams purrr::map
 #'
