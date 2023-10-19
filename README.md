@@ -31,55 +31,67 @@ remotes::install_github("orgadish/dedup")
 ``` r
 library(deduped)
 
-slow_func <- function(x) for(i in x) {Sys.sleep(0.001)}
+slow_func <- function(x) {
+  for (i in x) {
+    Sys.sleep(0.001)
+  }
+}
 
 # deduped()
 unique_vec <- sample(LETTERS, 10)
 unique_vec
-#>  [1] "A" "I" "G" "C" "X" "O" "T" "E" "V" "B"
+#>  [1] "M" "B" "A" "X" "D" "T" "V" "E" "U" "C"
 
 duplicated_vec <- sample(rep(unique_vec, 100))
 length(duplicated_vec)
 #> [1] 1000
 
-system.time({y1 <- slow_func(duplicated_vec)})
+system.time({
+  y1 <- slow_func(duplicated_vec)
+})
 #>    user  system elapsed 
-#>   0.020   0.012   1.232
-system.time({y2 <- deduped(slow_func)(duplicated_vec)})
+#>   0.014   0.010   1.154
+system.time({
+  y2 <- deduped(slow_func)(duplicated_vec)
+})
 #>    user  system elapsed 
-#>   0.111   0.012   0.138
+#>   0.089   0.008   0.108
 all(y1 == y2)
 #> [1] TRUE
 
 
 # deduped_map()
-unique_list <- purrr::map(1:5, function(j) sample(LETTERS, j, replace=TRUE))
+unique_list <- purrr::map(1:5, function(j) sample(LETTERS, j, replace = TRUE))
 unique_list
 #> [[1]]
-#> [1] "U"
+#> [1] "P"
 #> 
 #> [[2]]
-#> [1] "O" "R"
+#> [1] "L" "E"
 #> 
 #> [[3]]
-#> [1] "B" "R" "C"
+#> [1] "N" "W" "A"
 #> 
 #> [[4]]
-#> [1] "O" "O" "X" "R"
+#> [1] "P" "Q" "I" "V"
 #> 
 #> [[5]]
-#> [1] "Q" "A" "N" "H" "J"
+#> [1] "X" "A" "N" "H" "D"
 
-duplicated_list <- sample(rep(unique_list, 100))  # Create a duplicated list
+duplicated_list <- sample(rep(unique_list, 100)) # Create a duplicated list
 length(duplicated_list)
 #> [1] 500
 
-system.time({z1 <- purrr::map(duplicated_list, slow_func)})
+system.time({
+  z1 <- purrr::map(duplicated_list, slow_func)
+})
 #>    user  system elapsed 
-#>   0.037   0.023   1.884
-system.time({z2 <- deduped_map(duplicated_list, slow_func)})
+#>   0.026   0.017   1.760
+system.time({
+  z2 <- deduped_map(duplicated_list, slow_func)
+})
 #>    user  system elapsed 
-#>   0.019   0.007   0.046
+#>   0.015   0.007   0.041
 
 all.equal(z1, z2)
 #> [1] TRUE
@@ -88,7 +100,6 @@ all.equal(z1, z2)
 ## `file_path` Example
 
 ``` r
-
 # Create multiple CSVs to read
 tf <- tempfile()
 dir.create(tf)
@@ -131,17 +142,19 @@ duplicated_mtcars_from_files
 #> # ℹ 319,990 more rows
 
 system.time({
-  df1 <- dplyr::mutate(duplicated_mtcars_from_files, 
-                      file_name = basename(file_path))
+  df1 <- dplyr::mutate(duplicated_mtcars_from_files,
+    file_name = basename(file_path)
+  )
 })
 #>    user  system elapsed 
-#>   0.084   0.000   0.085
+#>   0.091   0.002   0.095
 system.time({
-  df2 <- dplyr::mutate(duplicated_mtcars_from_files, 
-                      file_name = deduped(basename)(file_path))
+  df2 <- dplyr::mutate(duplicated_mtcars_from_files,
+    file_name = deduped(basename)(file_path)
+  )
 })
 #>    user  system elapsed 
-#>   0.007   0.001   0.008
+#>   0.005   0.000   0.007
 
 all.equal(df1, df2)
 #> [1] TRUE

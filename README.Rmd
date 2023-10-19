@@ -37,7 +37,11 @@ remotes::install_github("orgadish/dedup")
 ```{r example}
 library(deduped)
 
-slow_func <- function(x) for(i in x) {Sys.sleep(0.001)}
+slow_func <- function(x) {
+  for (i in x) {
+    Sys.sleep(0.001)
+  }
+}
 
 # deduped()
 unique_vec <- sample(LETTERS, 10)
@@ -46,20 +50,28 @@ unique_vec
 duplicated_vec <- sample(rep(unique_vec, 100))
 length(duplicated_vec)
 
-system.time({y1 <- slow_func(duplicated_vec)})
-system.time({y2 <- deduped(slow_func)(duplicated_vec)})
+system.time({
+  y1 <- slow_func(duplicated_vec)
+})
+system.time({
+  y2 <- deduped(slow_func)(duplicated_vec)
+})
 all(y1 == y2)
 
 
 # deduped_map()
-unique_list <- purrr::map(1:5, function(j) sample(LETTERS, j, replace=TRUE))
+unique_list <- purrr::map(1:5, function(j) sample(LETTERS, j, replace = TRUE))
 unique_list
 
-duplicated_list <- sample(rep(unique_list, 100))  # Create a duplicated list
+duplicated_list <- sample(rep(unique_list, 100)) # Create a duplicated list
 length(duplicated_list)
 
-system.time({z1 <- purrr::map(duplicated_list, slow_func)})
-system.time({z2 <- deduped_map(duplicated_list, slow_func)})
+system.time({
+  z1 <- purrr::map(duplicated_list, slow_func)
+})
+system.time({
+  z2 <- deduped_map(duplicated_list, slow_func)
+})
 
 all.equal(z1, z2)
 ```
@@ -67,7 +79,6 @@ all.equal(z1, z2)
 ## `file_path` Example
 
 ```{r file_path_example}
-
 # Create multiple CSVs to read
 tf <- tempfile()
 dir.create(tf)
@@ -89,12 +100,14 @@ duplicated_mtcars_from_files <- readr::read_csv(
 duplicated_mtcars_from_files
 
 system.time({
-  df1 <- dplyr::mutate(duplicated_mtcars_from_files, 
-                      file_name = basename(file_path))
+  df1 <- dplyr::mutate(duplicated_mtcars_from_files,
+    file_name = basename(file_path)
+  )
 })
 system.time({
-  df2 <- dplyr::mutate(duplicated_mtcars_from_files, 
-                      file_name = deduped(basename)(file_path))
+  df2 <- dplyr::mutate(duplicated_mtcars_from_files,
+    file_name = deduped(basename)(file_path)
+  )
 })
 
 all.equal(df1, df2)

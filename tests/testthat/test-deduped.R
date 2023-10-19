@@ -2,7 +2,7 @@ test_that("deduped(f) runs only on deduplicated values", {
   get_ncalls <- function() as.integer(Sys.getenv("ncalls"))
   increment_ncalls <- function() Sys.setenv(ncalls = get_ncalls() + 1L)
 
-  f <- function(ii) for(i in ii) increment_ncalls()
+  f <- function(ii) for (i in ii) increment_ncalls()
 
   withr::with_envvar(
     c(ncalls = 0),

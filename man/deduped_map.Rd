@@ -44,12 +44,20 @@ a basic progress bar, use a string to give it a name, or see
 Acts like `purrr::map()` but only on unique elements.
 }
 \examples{
-slow_func <- function(x) for(i in x) {Sys.sleep(0.001)}
-ux <- purrr::map(1:5, function(j) sample(LETTERS, j, replace=TRUE))
-x <- sample(rep(ux, 10))  # Create a duplicated vector
+slow_func <- function(x) {
+  for (i in x) {
+    Sys.sleep(0.001)
+  }
+}
+ux <- purrr::map(1:5, function(j) sample(LETTERS, j, replace = TRUE))
+x <- sample(rep(ux, 10)) # Create a duplicated vector
 
-system.time({y1 <- purrr::map(x, slow_func)})
-system.time({y2 <- deduped_map(x, slow_func)})
+system.time({
+  y1 <- purrr::map(x, slow_func)
+})
+system.time({
+  y2 <- deduped_map(x, slow_func)
+})
 
 all.equal(y1, y2)
 }

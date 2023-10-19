@@ -5,10 +5,10 @@ test_that("deduped_map(f) runs only on deduplicated values", {
   f <- function(i) increment_ncalls()
 
   x <- list(
-    c(1,2),
+    c(1, 2),
     "A",
-    data.frame(x="A"),
-    data.frame(y=1)
+    data.frame(x = "A"),
+    data.frame(y = 1)
   )
   xr <- rep(x, 5)
 
@@ -31,10 +31,10 @@ test_that("deduped_map(f) runs only on deduplicated values", {
 
 test_that("deduped_map(f) returns the data in the same order", {
   x <- list(
-    c(1,2),
+    c(1, 2),
     "A",
-    data.frame(x="A"),
-    data.frame(y=1)
+    data.frame(x = "A"),
+    data.frame(y = 1)
   )
   xr <- rep(x, 5)
   pass_through <- function(i) i
