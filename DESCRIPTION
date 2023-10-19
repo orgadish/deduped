@@ -2,9 +2,9 @@ Package: deduped
 Type: Package
 Title: Making "Deduplicated" Functions
 Version: 0.1.3
-Author: Or Gadish
-Maintainer: Or Gadish <orgadish@gmail.com>
-Description: Contains one main function `deduped()` that returns a 
+Authors@R:
+    person("Or", "Gadish", email = "orgadish@gmail.com", role = c("aut", "cre", "cph"))
+Description: Contains one main function deduped() that returns a 
     function that acts on the unique values of the first input
     and expands the results back. This can significantly speed
     up certain slow iterative functions.
