@@ -1,4 +1,4 @@
-# Resubmission: deduped 0.1.3.1
+# Resubmission: deduped 0.1.4
 Addressed reviewer comments from 2023-10-20
 - Added \value to deduped_map.Rd.
 
@@ -8,7 +8,7 @@ Other minor updates
 
 ## R CMD check results
 
-── R CMD check results ─────────────────────────────────── deduped 0.1.3.1 ────
+── R CMD check results ─────────────────────────────────── deduped 0.1.4 ────
 Duration: 13.8s
 
 0 errors ✔ | 0 warnings ✔ | 0 notes ✔
