@@ -1,9 +1,16 @@
-#' Apply a function to each unique element of a vector
+#' Apply a function to each _unique_ element
 #'
 #' @description
-#' Acts like `purrr::map()` but only on unique elements.
+#' Acts like [purrr::map()] but only performs the computation on unique
+#' elements.
 #'
 #' @inheritParams purrr::map
+#'
+#' @return
+#' A list whose length is the same as the length of the input,
+#' matching the output of [purrr::map()].
+#'
+#' @seealso [deduped()]
 #'
 #' @export
 #'

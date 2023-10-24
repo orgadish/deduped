@@ -1,3 +1,18 @@
+# Resubmission: deduped 0.1.3.1
+Addressed reviewer comments from 2023-10-20
+- Added \value to deduped_map.Rd.
+
+Other minor updates
+- Set `Roxygen: list(markdown = TRUE)`
+- Updated wording in documentation.
+
+## R CMD check results
+
+── R CMD check results ─────────────────────────────────── deduped 0.1.3.1 ────
+Duration: 13.8s
+
+0 errors ✔ | 0 warnings ✔ | 0 notes ✔
+
 # Resubmission: deduped 0.1.3
 Addressed reviewer comments from 2023-10-19
 - Use Authors@R instead of Author, Maintainer

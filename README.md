@@ -6,15 +6,16 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of `deduped` is to provide utility functions that makes it
-easier to speed up functions that are commonly run on vectors
-(`deduped()`) or lists (`deduped_map()`) with significant duplication.
+The goal of `deduped` is to provide utility functions that make it
+easier to speed up vectorized functions (`deduped()`) or map functions
+(`deduped_map()`) when the arguments contain significant duplication.
 
 One particular use case of `deduped()` that I come across a lot is when
-using `basename` and `dirname` on the `file_path` column after reading
-multiple CSVs (e.g. with `readr::read_csv(..., id="file_path")`).
-`basename` and `dirname` are surprisingly slow (especially on Windows),
-and most of the column is duplicated.
+using `basename()` and `dirname()` on the `file_path` column after
+reading multiple CSVs (e.g. with
+`readr::read_csv(..., id="file_path")`). `basename()` and `dirname()`
+are surprisingly slow (especially on Windows), and most of the column is
+duplicated.
 
 ## Installation
 
@@ -40,7 +41,7 @@ slow_func <- function(x) {
 # deduped()
 unique_vec <- sample(LETTERS, 10)
 unique_vec
-#>  [1] "M" "B" "A" "X" "D" "T" "V" "E" "U" "C"
+#>  [1] "O" "A" "E" "C" "K" "F" "D" "S" "V" "G"
 
 duplicated_vec <- sample(rep(unique_vec, 100))
 length(duplicated_vec)
@@ -50,12 +51,12 @@ system.time({
   y1 <- slow_func(duplicated_vec)
 })
 #>    user  system elapsed 
-#>   0.014   0.010   1.154
+#>   0.026   0.019   1.268
 system.time({
   y2 <- deduped(slow_func)(duplicated_vec)
 })
 #>    user  system elapsed 
-#>   0.089   0.008   0.108
+#>   0.115   0.012   0.141
 all(y1 == y2)
 #> [1] TRUE
 
@@ -64,19 +65,19 @@ all(y1 == y2)
 unique_list <- purrr::map(1:5, function(j) sample(LETTERS, j, replace = TRUE))
 unique_list
 #> [[1]]
-#> [1] "P"
+#> [1] "I"
 #> 
 #> [[2]]
-#> [1] "L" "E"
+#> [1] "A" "W"
 #> 
 #> [[3]]
-#> [1] "N" "W" "A"
+#> [1] "F" "C" "I"
 #> 
 #> [[4]]
-#> [1] "P" "Q" "I" "V"
+#> [1] "I" "X" "Y" "P"
 #> 
 #> [[5]]
-#> [1] "X" "A" "N" "H" "D"
+#> [1] "T" "H" "L" "R" "B"
 
 duplicated_list <- sample(rep(unique_list, 100)) # Create a duplicated list
 length(duplicated_list)
@@ -86,12 +87,12 @@ system.time({
   z1 <- purrr::map(duplicated_list, slow_func)
 })
 #>    user  system elapsed 
-#>   0.026   0.017   1.760
+#>   0.040   0.025   1.916
 system.time({
   z2 <- deduped_map(duplicated_list, slow_func)
 })
 #>    user  system elapsed 
-#>   0.015   0.007   0.041
+#>   0.020   0.008   0.048
 
 all.equal(z1, z2)
 #> [1] TRUE
@@ -147,14 +148,14 @@ system.time({
   )
 })
 #>    user  system elapsed 
-#>   0.091   0.002   0.095
+#>   0.080   0.001   0.081
 system.time({
   df2 <- dplyr::mutate(duplicated_mtcars_from_files,
     file_name = deduped(basename)(file_path)
   )
 })
 #>    user  system elapsed 
-#>   0.005   0.000   0.007
+#>   0.006   0.000   0.007
 
 all.equal(df1, df2)
 #> [1] TRUE

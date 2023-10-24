@@ -2,7 +2,7 @@
 % Please edit documentation in R/deduped.R
 \name{deduped}
 \alias{deduped}
-\title{Deduplicate a function on its first argument}
+\title{Deduplicate a vectorized function to act on \emph{unique} elements}
 \usage{
 deduped(f)
 }
@@ -10,10 +10,12 @@ deduped(f)
 \item{f}{Function to deduplicate.}
 }
 \value{
-Deduplicated function
+Deduplicated function.
 }
 \description{
-Deduplicate a function on its first argument
+Converts a vectorized function into one that only performs the computations
+on unique values in the first argument. The result is then expanded so that
+it is the same as if the computation was performed on all elements.
 }
 \examples{
 
@@ -37,4 +39,7 @@ system.time({
 })
 
 all(y1 == y2)
+}
+\seealso{
+\code{\link[=deduped_map]{deduped_map()}}, a deduplicated version of \code{\link[purrr:map]{purrr::map()}}.
 }

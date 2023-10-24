@@ -2,7 +2,7 @@
 % Please edit documentation in R/deduped_map.R
 \name{deduped_map}
 \alias{deduped_map}
-\title{Apply a function to each unique element of a vector}
+\title{Apply a function to each \emph{unique} element}
 \usage{
 deduped_map(.x, .f, ..., .progress = FALSE)
 }
@@ -40,8 +40,13 @@ function and will tend to yield better error messages.}
 a basic progress bar, use a string to give it a name, or see
 \link[purrr]{progress_bars} for more details.}
 }
+\value{
+A list whose length is the same as the length of the input,
+matching the output of \code{\link[purrr:map]{purrr::map()}}.
+}
 \description{
-Acts like `purrr::map()` but only on unique elements.
+Acts like \code{\link[purrr:map]{purrr::map()}} but only performs the computation on unique
+elements.
 }
 \examples{
 slow_func <- function(x) {
@@ -60,4 +65,7 @@ system.time({
 })
 
 all.equal(y1, y2)
+}
+\seealso{
+\code{\link[=deduped]{deduped()}}
 }

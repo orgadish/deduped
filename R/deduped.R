@@ -1,9 +1,16 @@
-#' Deduplicate a function on its first argument
+#' Deduplicate a vectorized function to act on _unique_ elements
+#'
+#' @description
+#' Converts a vectorized function into one that only performs the computations
+#' on unique values in the first argument. The result is then expanded so that
+#' it is the same as if the computation was performed on all elements.
 #'
 #' @param f Function to deduplicate.
 #'
-#' @return Deduplicated function
+#' @return Deduplicated function.
 #' @export
+#'
+#' @seealso [deduped_map()], a deduplicated version of [purrr::map()].
 #'
 #' @examples
 #'
