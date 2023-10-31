@@ -4,6 +4,8 @@
 # deduped
 
 <!-- badges: start -->
+
+[![](https://cranlogs.r-pkg.org/badges/deduped)](https://cran.r-project.org/package=deduped)
 <!-- badges: end -->
 
 The goal of `deduped` is to provide utility functions that make it
@@ -31,6 +33,7 @@ remotes::install_github("orgadish/dedup")
 
 ``` r
 library(deduped)
+set.seed(0)
 
 slow_func <- function(x) {
   for (i in x) {
@@ -41,7 +44,7 @@ slow_func <- function(x) {
 # deduped()
 unique_vec <- sample(LETTERS, 10)
 unique_vec
-#>  [1] "O" "A" "E" "C" "K" "F" "D" "S" "V" "G"
+#>  [1] "N" "Y" "D" "G" "A" "B" "K" "Z" "R" "V"
 
 duplicated_vec <- sample(rep(unique_vec, 100))
 length(duplicated_vec)
@@ -51,12 +54,12 @@ system.time({
   y1 <- slow_func(duplicated_vec)
 })
 #>    user  system elapsed 
-#>   0.026   0.019   1.268
+#>   0.023   0.015   1.269
 system.time({
   y2 <- deduped(slow_func)(duplicated_vec)
 })
 #>    user  system elapsed 
-#>   0.115   0.012   0.141
+#>   0.110   0.010   0.132
 all(y1 == y2)
 #> [1] TRUE
 
@@ -65,19 +68,19 @@ all(y1 == y2)
 unique_list <- purrr::map(1:5, function(j) sample(LETTERS, j, replace = TRUE))
 unique_list
 #> [[1]]
-#> [1] "I"
+#> [1] "M"
 #> 
 #> [[2]]
-#> [1] "A" "W"
+#> [1] "P" "Y"
 #> 
 #> [[3]]
-#> [1] "F" "C" "I"
+#> [1] "D" "E" "L"
 #> 
 #> [[4]]
-#> [1] "I" "X" "Y" "P"
+#> [1] "B" "I" "J" "N"
 #> 
 #> [[5]]
-#> [1] "T" "H" "L" "R" "B"
+#> [1] "W" "T" "F" "E" "S"
 
 duplicated_list <- sample(rep(unique_list, 100)) # Create a duplicated list
 length(duplicated_list)
@@ -87,12 +90,12 @@ system.time({
   z1 <- purrr::map(duplicated_list, slow_func)
 })
 #>    user  system elapsed 
-#>   0.040   0.025   1.916
+#>   0.037   0.023   1.913
 system.time({
   z2 <- deduped_map(duplicated_list, slow_func)
 })
 #>    user  system elapsed 
-#>   0.020   0.008   0.048
+#>   0.020   0.008   0.047
 
 all.equal(z1, z2)
 #> [1] TRUE
@@ -148,14 +151,14 @@ system.time({
   )
 })
 #>    user  system elapsed 
-#>   0.080   0.001   0.081
+#>   0.084   0.001   0.085
 system.time({
   df2 <- dplyr::mutate(duplicated_mtcars_from_files,
     file_name = deduped(basename)(file_path)
   )
 })
 #>    user  system elapsed 
-#>   0.006   0.000   0.007
+#>   0.007   0.001   0.008
 
 all.equal(df1, df2)
 #> [1] TRUE
