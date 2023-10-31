@@ -26,7 +26,7 @@ You can install the development version of `deduped` like so:
 ``` r
 if(!requireNamespace("remotes")) install.packages("remotes")
 
-remotes::install_github("orgadish/dedup")
+remotes::install_github("orgadish/deduped")
 ```
 
 ## Examples
