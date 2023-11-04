@@ -25,7 +25,14 @@ One particular use case of `deduped()` that I come across a lot is when using `b
 
 ## Installation
 
-You can install the development version of `deduped` like so:
+You can install the released version of `deduped` from
+[CRAN](https://cran.r-project.org/package=deduped) with:
+
+``` r
+install.packages("deduped")
+```
+
+And the development version from [GitHub](https://github.com/orgadish/deduped):
 
 ``` r
 if(!requireNamespace("remotes")) install.packages("remotes")
@@ -97,17 +104,20 @@ invisible(sapply(
 
 duplicated_mtcars_from_files <- readr::read_csv(
   list.files(tf, full.names = TRUE),
-  id = "file_path"
+  id = "file_path",
+  show_col_types = FALSE
 )
-duplicated_mtcars_from_files
+dplyr::count(duplicated_mtcars_from_files, basename(file_path))
 
 system.time({
-  df1 <- dplyr::mutate(duplicated_mtcars_from_files,
+  df1 <- dplyr::mutate(
+    duplicated_mtcars_from_files,
     file_name = basename(file_path)
   )
 })
 system.time({
-  df2 <- dplyr::mutate(duplicated_mtcars_from_files,
+  df2 <- dplyr::mutate(
+    duplicated_mtcars_from_files,
     file_name = deduped(basename)(file_path)
   )
 })

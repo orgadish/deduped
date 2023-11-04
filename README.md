@@ -21,7 +21,15 @@ duplicated.
 
 ## Installation
 
-You can install the development version of `deduped` like so:
+You can install the released version of `deduped` from
+[CRAN](https://cran.r-project.org/package=deduped) with:
+
+``` r
+install.packages("deduped")
+```
+
+And the development version from
+[GitHub](https://github.com/orgadish/deduped):
 
 ``` r
 if(!requireNamespace("remotes")) install.packages("remotes")
@@ -54,12 +62,12 @@ system.time({
   y1 <- slow_func(duplicated_vec)
 })
 #>    user  system elapsed 
-#>   0.023   0.015   1.269
+#>   0.018   0.013   1.218
 system.time({
   y2 <- deduped(slow_func)(duplicated_vec)
 })
 #>    user  system elapsed 
-#>   0.110   0.010   0.132
+#>   0.117   0.012   0.148
 all(y1 == y2)
 #> [1] TRUE
 
@@ -90,12 +98,12 @@ system.time({
   z1 <- purrr::map(duplicated_list, slow_func)
 })
 #>    user  system elapsed 
-#>   0.037   0.023   1.913
+#>   0.030   0.018   1.829
 system.time({
   z2 <- deduped_map(duplicated_list, slow_func)
 })
 #>    user  system elapsed 
-#>   0.020   0.008   0.047
+#>   0.020   0.010   0.054
 
 all.equal(z1, z2)
 #> [1] TRUE
@@ -120,45 +128,32 @@ invisible(sapply(
 
 duplicated_mtcars_from_files <- readr::read_csv(
   list.files(tf, full.names = TRUE),
-  id = "file_path"
+  id = "file_path",
+  show_col_types = FALSE
 )
-#> Rows: 320000 Columns: 12
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: ","
-#> dbl (11): mpg, cyl, disp, hp, drat, wt, qsec, vs, am, gear, carb
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-duplicated_mtcars_from_files
-#> # A tibble: 320,000 × 12
-#>    file_path     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
-#>    <chr>       <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-#>  1 /var/folde…  21.4     6  258    110  3.08  3.22  19.4     1     0     3     1
-#>  2 /var/folde…  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2
-#>  3 /var/folde…  18.1     6  225    105  2.76  3.46  20.2     1     0     3     1
-#>  4 /var/folde…  14.3     8  360    245  3.21  3.57  15.8     0     0     3     4
-#>  5 /var/folde…  24.4     4  147.    62  3.69  3.19  20       1     0     4     2
-#>  6 /var/folde…  22.8     4  141.    95  3.92  3.15  22.9     1     0     4     2
-#>  7 /var/folde…  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4
-#>  8 /var/folde…  17.8     6  168.   123  3.92  3.44  18.9     1     0     4     4
-#>  9 /var/folde…  16.4     8  276.   180  3.07  4.07  17.4     0     0     3     3
-#> 10 /var/folde…  17.3     8  276.   180  3.07  3.73  17.6     0     0     3     3
-#> # ℹ 319,990 more rows
+dplyr::count(duplicated_mtcars_from_files, basename(file_path))
+#> # A tibble: 2 × 2
+#>   `basename(file_path)`      n
+#>   <chr>                  <int>
+#> 1 mtcars_0.csv          190000
+#> 2 mtcars_1.csv          130000
 
 system.time({
-  df1 <- dplyr::mutate(duplicated_mtcars_from_files,
+  df1 <- dplyr::mutate(
+    duplicated_mtcars_from_files,
     file_name = basename(file_path)
   )
 })
 #>    user  system elapsed 
-#>   0.084   0.001   0.085
+#>   0.119   0.001   0.119
 system.time({
-  df2 <- dplyr::mutate(duplicated_mtcars_from_files,
+  df2 <- dplyr::mutate(
+    duplicated_mtcars_from_files,
     file_name = deduped(basename)(file_path)
   )
 })
 #>    user  system elapsed 
-#>   0.007   0.001   0.008
+#>   0.010   0.001   0.012
 
 all.equal(df1, df2)
 #> [1] TRUE
