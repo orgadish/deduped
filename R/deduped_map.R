@@ -3,7 +3,7 @@
 #' @description
 #' DEPRECATED as of deduped 0.2.0.
 #'
-#' &#x2139; Please use `deduped(lapply)()` or `deduped(purrr::map)()` instead.
+#' Please use `deduped(lapply)()` or `deduped(purrr::map)()` instead.
 #'
 #' @inheritParams purrr::map
 #'

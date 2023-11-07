@@ -47,7 +47,7 @@ matching the output of \code{\link[purrr:map]{purrr::map()}}.
 \description{
 DEPRECATED as of deduped 0.2.0.
 
-ℹ Please use \code{deduped(lapply)()} or \code{deduped(purrr::map)()} instead.
+Please use \code{deduped(lapply)()} or \code{deduped(purrr::map)()} instead.
 }
 \seealso{
 \code{\link[=deduped]{deduped()}}
