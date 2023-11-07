@@ -7,10 +7,10 @@
 deduped(f)
 }
 \arguments{
-\item{f}{Function to deduplicate.}
+\item{f}{Function that accepts a vector or list as its first input.}
 }
 \value{
-Deduplicated function.
+Deduplicated version of \code{f}.
 }
 \description{
 Converts a vectorized function into one that only performs the computations
@@ -39,7 +39,4 @@ system.time({
 })
 
 all(y1 == y2)
-}
-\seealso{
-\code{\link[=deduped_map]{deduped_map()}}, a deduplicated version of \code{\link[purrr:map]{purrr::map()}}.
 }

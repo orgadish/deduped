@@ -28,3 +28,23 @@ test_that("deduped(f) returns the data in the same order", {
   pass_through <- \(i) i
   expect_equal(deduped(pass_through)(x), x)
 })
+
+test_that("deduped(f) works on lists", {
+  x <- list("ABC", "ABC")
+  expect_equal(
+    deduped(tolower)(x),
+    tolower(x)
+  )
+})
+
+test_that("deduped(f) errors on matrices or data frames", {
+  pass_through <- \(i) i
+
+  expect_error(
+    deduped(pass_through)(matrix(1:10))
+  )
+
+  expect_error(
+    deduped(pass_through)(data.frame(1:10))
+  )
+})

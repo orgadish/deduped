@@ -19,7 +19,9 @@ knitr::opts_chunk$set(
 [![](https://cranlogs.r-pkg.org/badges/deduped)](https://cran.r-project.org/package=deduped)
 <!-- badges: end -->
 
-The goal of `deduped` is to provide utility functions that make it easier to speed up vectorized functions (`deduped()`) or map functions (`deduped_map()`) when the arguments contain significant duplication.
+`deduped` contains one main function `deduped()` which speeds up slow,
+vectorized functions by only performing computations on the unique values
+of the input and expanding the results at the end.
 
 One particular use case of `deduped()` that I come across a lot is when using `basename()` and `dirname()` on the `file_path` column after reading multiple CSVs (e.g. with `readr::read_csv(..., id="file_path")`). `basename()` and `dirname()` are surprisingly slow (especially on Windows), and most of the column is duplicated.
 
@@ -42,12 +44,14 @@ remotes::install_github("orgadish/deduped")
 
 ## Examples
 
+### Basic Example
+
 ```{r example}
 library(deduped)
 set.seed(0)
 
-slow_func <- function(x) {
-  for (i in x) {
+slow_func <- function(ii) {
+  for (i in ii) {
     Sys.sleep(0.001)
   }
 }
@@ -60,32 +64,33 @@ duplicated_vec <- sample(rep(unique_vec, 100))
 length(duplicated_vec)
 
 system.time({
-  y1 <- slow_func(duplicated_vec)
+  x1 <- deduped(slow_func)(duplicated_vec)
 })
 system.time({
-  y2 <- deduped(slow_func)(duplicated_vec)
+  x2 <- slow_func(duplicated_vec)
 })
-all(y1 == y2)
+all.equal(x1, x2)
 
 
-# deduped_map()
-unique_list <- purrr::map(1:5, function(j) sample(LETTERS, j, replace = TRUE))
-unique_list
+# deduped() can be combined with lapply() or purrr::map().
+unique_list <- lapply(1:5, function(j) sample(LETTERS, j, replace = TRUE))
+str(unique_list)
 
-duplicated_list <- sample(rep(unique_list, 100)) # Create a duplicated list
+# Create a list with significant duplication.
+duplicated_list <- sample(rep(unique_list, 100)) 
 length(duplicated_list)
 
 system.time({
-  z1 <- purrr::map(duplicated_list, slow_func)
+  y1 <- deduped(lapply)(duplicated_list, slow_func)
 })
 system.time({
-  z2 <- deduped_map(duplicated_list, slow_func)
+  y2 <- lapply(duplicated_list, slow_func)
 })
 
-all.equal(z1, z2)
+all.equal(y1, y2)
 ```
 
-## `file_path` Example
+### `file_path` Example
 
 ```{r file_path_example}
 # Create multiple CSVs to read

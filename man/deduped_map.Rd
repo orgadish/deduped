@@ -45,26 +45,9 @@ A list whose length is the same as the length of the input,
 matching the output of \code{\link[purrr:map]{purrr::map()}}.
 }
 \description{
-Acts like \code{\link[purrr:map]{purrr::map()}} but only performs the computation on unique
-elements.
-}
-\examples{
-slow_func <- function(x) {
-  for (i in x) {
-    Sys.sleep(0.001)
-  }
-}
-ux <- purrr::map(1:5, function(j) sample(LETTERS, j, replace = TRUE))
-x <- sample(rep(ux, 10)) # Create a duplicated vector
+DEPRECATED as of deduped 0.2.0.
 
-system.time({
-  y1 <- purrr::map(x, slow_func)
-})
-system.time({
-  y2 <- deduped_map(x, slow_func)
-})
-
-all.equal(y1, y2)
+ℹ Please use \code{deduped(lapply)()} or \code{deduped(purrr::map)()} instead.
 }
 \seealso{
 \code{\link[=deduped]{deduped()}}

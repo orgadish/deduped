@@ -22,14 +22,14 @@
     },
     "collapse": {
       "Package": "collapse",
-      "Version": "1.9.6",
+      "Version": "2.0.3",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
         "R",
         "Rcpp"
       ],
-      "Hash": "a3786192601b0e69c491c805dadebd5d"
+      "Hash": "3fdb18c28fb12e7c9037173aa4575910"
     },
     "fastmatch": {
       "Package": "fastmatch",

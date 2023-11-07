@@ -5,12 +5,11 @@
 #' on unique values in the first argument. The result is then expanded so that
 #' it is the same as if the computation was performed on all elements.
 #'
-#' @param f Function to deduplicate.
 #'
-#' @return Deduplicated function.
+#' @param f Function that accepts a vector or list as its first input.
+#'
+#' @return Deduplicated version of `f`.
 #' @export
-#'
-#' @seealso [deduped_map()], a deduplicated version of [purrr::map()].
 #'
 #' @examples
 #'
@@ -36,7 +35,16 @@
 #' all(y1 == y2)
 deduped <- function(f) {
   function(x, ...) {
-    ux <- collapse::funique(x)
+    # collapse::funique() is faster than unique(), but behaves differently
+    # on lists.
+    if (inherits(x, "list")) {
+      ux <- unique(x)
+    } else if (is.atomic(x)) {
+      ux <- collapse::funique(x)
+    } else {
+      stop("`deduped(f)()` only works on atomic vector or list inputs.")
+    }
+
     f(ux, ...)[fastmatch::fmatch(x, ux)]
   }
 }

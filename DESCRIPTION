@@ -1,23 +1,21 @@
 Package: deduped
 Type: Package
 Title: Making "Deduplicated" Functions
-Version: 0.1.4
+Version: 0.2.0
 Authors@R:
     person("Or", "Gadish", email = "orgadish@gmail.com", role = c("aut", "cre", "cph"))
-Description: Contains one main function deduped() that returns a 
-    function that acts on the unique values of the first input
-    and expands the results back. This can significantly speed
-    up certain slow iterative functions.
+Description: Contains one main function deduped() which speeds up slow,
+    vectorized functions by only performing computations on the unique values
+    of the input and expanding the results at the end.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
     collapse,
-    fastmatch
+    fastmatch,
 RoxygenNote: 7.2.3
 Suggests: 
     dplyr,
-    hashr,
     purrr,
     readr,
     testthat (>= 3.0.0),

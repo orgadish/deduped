@@ -8,9 +8,9 @@
 [![](https://cranlogs.r-pkg.org/badges/deduped)](https://cran.r-project.org/package=deduped)
 <!-- badges: end -->
 
-The goal of `deduped` is to provide utility functions that make it
-easier to speed up vectorized functions (`deduped()`) or map functions
-(`deduped_map()`) when the arguments contain significant duplication.
+`deduped` contains one main function `deduped()` which speeds up slow,
+vectorized functions by only performing computations on the unique
+values of the input and expanding the results at the end.
 
 One particular use case of `deduped()` that I come across a lot is when
 using `basename()` and `dirname()` on the `file_path` column after
@@ -39,12 +39,14 @@ remotes::install_github("orgadish/deduped")
 
 ## Examples
 
+### Basic Example
+
 ``` r
 library(deduped)
 set.seed(0)
 
-slow_func <- function(x) {
-  for (i in x) {
+slow_func <- function(ii) {
+  for (i in ii) {
     Sys.sleep(0.001)
   }
 }
@@ -59,57 +61,50 @@ length(duplicated_vec)
 #> [1] 1000
 
 system.time({
-  y1 <- slow_func(duplicated_vec)
+  x1 <- deduped(slow_func)(duplicated_vec)
 })
 #>    user  system elapsed 
-#>   0.018   0.013   1.218
+#>   0.097   0.015   0.134
 system.time({
-  y2 <- deduped(slow_func)(duplicated_vec)
+  x2 <- slow_func(duplicated_vec)
 })
 #>    user  system elapsed 
-#>   0.117   0.012   0.148
-all(y1 == y2)
+#>   0.032   0.013   1.197
+all.equal(x1, x2)
 #> [1] TRUE
 
 
-# deduped_map()
-unique_list <- purrr::map(1:5, function(j) sample(LETTERS, j, replace = TRUE))
-unique_list
-#> [[1]]
-#> [1] "M"
-#> 
-#> [[2]]
-#> [1] "P" "Y"
-#> 
-#> [[3]]
-#> [1] "D" "E" "L"
-#> 
-#> [[4]]
-#> [1] "B" "I" "J" "N"
-#> 
-#> [[5]]
-#> [1] "W" "T" "F" "E" "S"
+# deduped() can be combined with lapply() or purrr::map().
+unique_list <- lapply(1:5, function(j) sample(LETTERS, j, replace = TRUE))
+str(unique_list)
+#> List of 5
+#>  $ : chr "M"
+#>  $ : chr [1:2] "P" "Y"
+#>  $ : chr [1:3] "D" "E" "L"
+#>  $ : chr [1:4] "B" "I" "J" "N"
+#>  $ : chr [1:5] "W" "T" "F" "E" ...
 
-duplicated_list <- sample(rep(unique_list, 100)) # Create a duplicated list
+# Create a list with significant duplication.
+duplicated_list <- sample(rep(unique_list, 100)) 
 length(duplicated_list)
 #> [1] 500
 
 system.time({
-  z1 <- purrr::map(duplicated_list, slow_func)
+  y1 <- deduped(lapply)(duplicated_list, slow_func)
 })
 #>    user  system elapsed 
-#>   0.030   0.018   1.829
+#>   0.001   0.000   0.018
 system.time({
-  z2 <- deduped_map(duplicated_list, slow_func)
+  y2 <- lapply(duplicated_list, slow_func)
 })
 #>    user  system elapsed 
-#>   0.020   0.010   0.054
+#>   0.025   0.016   1.756
 
-all.equal(z1, z2)
+all.equal(y1, y2)
 #> [1] TRUE
 ```
 
-## `file_path` Example
+### `file_path` Example
 
 ``` r
 # Create multiple CSVs to read
@@ -145,7 +140,7 @@ system.time({
   )
 })
 #>    user  system elapsed 
-#>   0.119   0.001   0.119
+#>   0.104   0.000   0.104
 system.time({
   df2 <- dplyr::mutate(
     duplicated_mtcars_from_files,
@@ -153,7 +148,7 @@ system.time({
   )
 })
 #>    user  system elapsed 
-#>   0.010   0.001   0.012
+#>   0.010   0.002   0.013
 
 all.equal(df1, df2)
 #> [1] TRUE
