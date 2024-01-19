@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.3.1",
+    "Version": "4.3.2",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -11,25 +11,25 @@
   "Packages": {
     "Rcpp": {
       "Package": "Rcpp",
-      "Version": "1.0.11",
+      "Version": "1.0.12",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
         "methods",
         "utils"
       ],
-      "Hash": "ae6cbbe1492f4de79c45fce06f967ce8"
+      "Hash": "5ea2700d21e038ace58269ecdbeb9ec0"
     },
     "collapse": {
       "Package": "collapse",
-      "Version": "2.0.3",
+      "Version": "2.0.9",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
         "R",
         "Rcpp"
       ],
-      "Hash": "3fdb18c28fb12e7c9037173aa4575910"
+      "Hash": "1fa1cb20a6a952201880d686fc916368"
     },
     "fastmatch": {
       "Package": "fastmatch",
