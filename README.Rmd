@@ -44,82 +44,94 @@ remotes::install_github("orgadish/deduped")
 
 ## Examples
 
-### Basic Example
-
-```{r example}
+### Setup
+```{r}
 library(deduped)
 set.seed(0)
 
 slow_func <- function(ii) {
   for (i in ii) {
-    Sys.sleep(0.001)
+    Sys.sleep(0.0005)
   }
 }
+```
 
-# deduped()
-unique_vec <- sample(LETTERS, 10)
+
+### `deduped()`
+
+```{r example}
+
+unique_vec <- sample(LETTERS, 5)
 unique_vec
 
-duplicated_vec <- sample(rep(unique_vec, 100))
+# Create a vector with significant duplication.
+duplicated_vec <- sample(rep(unique_vec, 50))
 length(duplicated_vec)
 
-system.time({
-  x1 <- deduped(slow_func)(duplicated_vec)
-})
-system.time({
-  x2 <- slow_func(duplicated_vec)
-})
+system.time({  x1 <- slow_func(duplicated_vec)  })
+system.time({  x2 <- deduped(slow_func)(duplicated_vec)  })
+
 all.equal(x1, x2)
+```
 
+### `deduped(lapply)()`
 
-# deduped() can be combined with lapply() or purrr::map().
-unique_list <- lapply(1:5, function(j) sample(LETTERS, j, replace = TRUE))
+`deduped()` can also be combined with `lapply()` or `purrr::map()`.
+
+```{r example-map}
+
+unique_list <- lapply(1:3, function(j) sample(LETTERS, j, replace = TRUE))
 str(unique_list)
 
 # Create a list with significant duplication.
-duplicated_list <- sample(rep(unique_list, 100)) 
+duplicated_list <- sample(rep(unique_list, 50)) 
 length(duplicated_list)
 
-system.time({
-  y1 <- deduped(lapply)(duplicated_list, slow_func)
-})
-system.time({
-  y2 <- lapply(duplicated_list, slow_func)
-})
+system.time({  y1 <- lapply(duplicated_list, slow_func)  })
+system.time({  y2 <- deduped(lapply)(duplicated_list, slow_func)  })
 
 all.equal(y1, y2)
 ```
 
-### `file_path` Example
+### Specific example: `deduped(basename)()` on file paths
+
+*Note: Times shown below are based on running R 4.3.2 on Windows 10, for which
+`basename()` is known to be slow: [Bug 18597](https://bugs.r-project.org/show_bug.cgi?id=18597).*
 
 ```{r file_path_example}
 # Create multiple CSVs to read
-tf <- tempfile()
-dir.create(tf)
+tf <- withr::local_tempdir()
 
 # Duplicate mtcars 10,000x and write 1 CSV for each value of `am`
 duplicated_mtcars <- dplyr::slice(mtcars, rep(1:nrow(mtcars), 10000))
 invisible(sapply(
   dplyr::group_split(duplicated_mtcars, am),
-  function(k) {
-    file_name <- paste0("mtcars_", unique(k$am), ".csv")
-    readr::write_csv(k, file.path(tf, file_name))
+  function(dat) {
+    file_name <- paste0("mtcars_", unique(dat$am), ".csv")
+    readr::write_csv(dat, file.path(tf, file_name))
   }
 ))
 
+# Read the separate files back in.
+mtcars_files <- list.files(tf, full.names = TRUE)
+length(mtcars_files)
+
 duplicated_mtcars_from_files <- readr::read_csv(
-  list.files(tf, full.names = TRUE),
+  mtcars_files,
   id = "file_path",
   show_col_types = FALSE
 )
 dplyr::count(duplicated_mtcars_from_files, basename(file_path))
 
+# Original: slow
 system.time({
   df1 <- dplyr::mutate(
     duplicated_mtcars_from_files,
     file_name = basename(file_path)
   )
 })
+
+# Deduped: fast
 system.time({
   df2 <- dplyr::mutate(
     duplicated_mtcars_from_files,
@@ -128,6 +140,4 @@ system.time({
 })
 
 all.equal(df1, df2)
-
-unlink(tf)
 ```
