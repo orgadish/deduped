@@ -13,7 +13,7 @@ LazyData: true
 Imports: 
     collapse,
     fastmatch,
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.3
 Suggests: 
     dplyr,
     purrr,
