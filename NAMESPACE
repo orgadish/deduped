@@ -2,3 +2,4 @@
 
 export(deduped)
 export(deduped_map)
+export(with_deduped)

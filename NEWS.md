@@ -1,3 +1,10 @@
+# deduped 0.3.0
+
+* Added `with_deduped()` to allow piping an existing expression without having
+  to break it up.
+* When a non-atomic vector `x` is passed into `deduped(f)(x)`, it now warns,
+  but simply performs `f(x)`, rather than error.
+
 # deduped 0.2.0
 
 * Updated `deduped()` to work correctly on list inputs.

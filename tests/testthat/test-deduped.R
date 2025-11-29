@@ -37,14 +37,14 @@ test_that("deduped(f) works on lists", {
   )
 })
 
-test_that("deduped(f) errors on matrices or data frames", {
+test_that("deduped(f) warns on matrices or data frames", {
   pass_through <- \(i) i
 
-  expect_error(
+  expect_warning(
     deduped(pass_through)(matrix(1:10))
   )
 
-  expect_error(
+  expect_warning(
     deduped(pass_through)(data.frame(1:10))
   )
 })

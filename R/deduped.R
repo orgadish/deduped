@@ -5,8 +5,7 @@
 #' on unique values in the first argument. The result is then expanded so that
 #' it is the same as if the computation was performed on all elements.
 #'
-#'
-#' @param f Function that accepts a vector or list as its first input.
+#' @param f A function that accepts a vector or list as its first input.
 #'
 #' @return Deduplicated version of `f`.
 #' @export
@@ -23,26 +22,38 @@
 #'   for (i in x) {
 #'     Sys.sleep(0.001)
 #'   }
+#'   tolower(x)
 #' }
 #'
 #' system.time({
 #'   y1 <- slow_func(large_x)
 #' })
+#'
 #' system.time({
 #'   y2 <- deduped(slow_func)(large_x)
 #' })
 #'
 #' all(y1 == y2)
 deduped <- function(f) {
+  # Ensure f is a function.
+  f <- match.fun(f)
+
   function(x, ...) {
+
+
     # collapse::funique() is faster than unique(), but behaves differently
     # on lists.
-    if (inherits(x, "list")) {
+    if (inherits(x, "list"))
+    {
       ux <- unique(x)
-    } else if (is.atomic(x)) {
+    } else if (is.vector(x) && is.atomic(x)) {
       ux <- collapse::funique(x)
     } else {
-      stop("`deduped(f)()` only works on atomic vector or list inputs.")
+      warning(paste(
+        "`deduped(f)(x)` only works on atomic vectors or list inputs.",
+        "Proceeding with f(x) directly."
+      ))
+      return(f(x, ...))
     }
 
     f(ux, ...)[fastmatch::fmatch(x, ux)]

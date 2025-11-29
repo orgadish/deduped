@@ -7,7 +7,7 @@
 deduped(f)
 }
 \arguments{
-\item{f}{Function that accepts a vector or list as its first input.}
+\item{f}{A function that accepts a vector or list as its first input.}
 }
 \value{
 Deduplicated version of \code{f}.
@@ -29,11 +29,13 @@ slow_func <- function(x) {
   for (i in x) {
     Sys.sleep(0.001)
   }
+  tolower(x)
 }
 
 system.time({
   y1 <- slow_func(large_x)
 })
+
 system.time({
   y2 <- deduped(slow_func)(large_x)
 })

@@ -21,9 +21,9 @@ knitr::opts_chunk$set(
 
 `deduped` contains one main function `deduped()` which speeds up slow,
 vectorized functions by only performing computations on the unique values
-of the input and expanding the results at the end.
-
-One particular use case of `deduped()` that I come across a lot is when using `basename()` and `dirname()` on the `file_path` column after reading multiple CSVs (e.g. with `readr::read_csv(..., id="file_path")`). `basename()` and `dirname()` are surprisingly slow (especially on Windows), and most of the column is duplicated.
+of the input and expanding the results at the end. A convenience wrapper,
+`with_deduped()`, was added in version 0.3.0 to allow piping an existing 
+expression.
 
 ## Installation
 
@@ -49,10 +49,11 @@ remotes::install_github("orgadish/deduped")
 library(deduped)
 set.seed(0)
 
-slow_func <- function(ii) {
-  for (i in ii) {
+slow_tolower <- function(x) {
+  for (i in x) {
     Sys.sleep(0.0005)
   }
+  tolower(x)
 }
 ```
 
@@ -61,18 +62,18 @@ slow_func <- function(ii) {
 
 ```{r example}
 
-unique_vec <- sample(LETTERS, 5)
-unique_vec
-
 # Create a vector with significant duplication.
+unique_vec <- sample(LETTERS, 5)
 duplicated_vec <- sample(rep(unique_vec, 50))
 length(duplicated_vec)
 
-system.time({  x1 <- slow_func(duplicated_vec)  })
-system.time({  x2 <- deduped(slow_func)(duplicated_vec)  })
+system.time({  x1 <- slow_tolower(duplicated_vec)  })
 
+
+system.time({  x2 <- deduped(slow_tolower)(duplicated_vec)  })
 all.equal(x1, x2)
 ```
+_Note: As of version 0.3.0, you could also use_ `slow_tolower(duplicated_vec) |> with_deduped()`.
 
 ### `deduped(lapply)()`
 
@@ -87,57 +88,8 @@ str(unique_list)
 duplicated_list <- sample(rep(unique_list, 50)) 
 length(duplicated_list)
 
-system.time({  y1 <- lapply(duplicated_list, slow_func)  })
-system.time({  y2 <- deduped(lapply)(duplicated_list, slow_func)  })
+system.time({  y1 <- lapply(duplicated_list, slow_tolower)  })
+system.time({  y2 <- deduped(lapply)(duplicated_list, slow_tolower)  })
 
 all.equal(y1, y2)
-```
-
-### Specific example: `deduped(basename)()` on file paths
-
-*Note: Times shown below are based on running R 4.3.2 on Windows 10, for which
-`basename()` is known to be slow: [Bug 18597](https://bugs.r-project.org/show_bug.cgi?id=18597).*
-
-```{r file_path_example}
-# Create multiple CSVs to read
-tf <- withr::local_tempdir()
-
-# Duplicate mtcars 10,000x and write 1 CSV for each value of `am`
-duplicated_mtcars <- dplyr::slice(mtcars, rep(1:nrow(mtcars), 10000))
-invisible(sapply(
-  dplyr::group_split(duplicated_mtcars, am),
-  function(dat) {
-    file_name <- paste0("mtcars_", unique(dat$am), ".csv")
-    readr::write_csv(dat, file.path(tf, file_name))
-  }
-))
-
-# Read the separate files back in.
-mtcars_files <- list.files(tf, full.names = TRUE)
-length(mtcars_files)
-
-duplicated_mtcars_from_files <- readr::read_csv(
-  mtcars_files,
-  id = "file_path",
-  show_col_types = FALSE
-)
-dplyr::count(duplicated_mtcars_from_files, basename(file_path))
-
-# Original: slow
-system.time({
-  df1 <- dplyr::mutate(
-    duplicated_mtcars_from_files,
-    file_name = basename(file_path)
-  )
-})
-
-# Deduped: fast
-system.time({
-  df2 <- dplyr::mutate(
-    duplicated_mtcars_from_files,
-    file_name = deduped(basename)(file_path)
-  )
-})
-
-all.equal(df1, df2)
 ```
