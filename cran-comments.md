@@ -1,3 +1,15 @@
+# Resubmission: deduped 0.3.0
+Added new `with_deduped()` and allowed `deduped()` to pass incompatible inputs
+through as-is with a warning rather than an error.
+
+## R CMD check results
+
+── R CMD check results ────────────────────────────────────────────────── deduped 0.3.0 ────
+Duration: 39.4s
+
+0 errors ✔ | 0 warnings ✔ | 0 notes ✔
+
+
 # Resubmission: deduped 0.2.0
 Fixed bug in `deduped()` and deprecated `deduped_map()`.
 
