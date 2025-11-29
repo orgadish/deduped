@@ -1,4 +1,6 @@
 test_that("deduped_map warns for deprecation, but works", {
+  testthat::skip_if_not_installed("purrr")
+
   x <- list("ABC", "ABC")
   expect_warning(deduped_map(x, tolower), "deprecated")
   expect_equal(
