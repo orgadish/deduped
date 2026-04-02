@@ -25,6 +25,8 @@ of the input and expanding the results at the end. A convenience wrapper,
 `with_deduped()`, was added in version 0.3.0 to allow piping an existing 
 expression.
 
+Note: It only works on functions that preserve length and order.
+
 ## Installation
 
 You can install the released version of `deduped` from
@@ -58,13 +60,15 @@ slow_tolower <- function(x) {
 ```
 
 
-### `deduped()`
+### `deduped(...)`
 
 ```{r example}
 
 # Create a vector with significant duplication.
+set.seed(1)
 unique_vec <- sample(LETTERS, 5)
-duplicated_vec <- sample(rep(unique_vec, 50))
+print(unique_vec)
+duplicated_vec <- sample(rep(unique_vec, 100))
 length(duplicated_vec)
 
 system.time({  x1 <- slow_tolower(duplicated_vec)  })
@@ -75,12 +79,13 @@ all.equal(x1, x2)
 ```
 _Note: As of version 0.3.0, you could also use_ `slow_tolower(duplicated_vec) |> with_deduped()`.
 
-### `deduped(lapply)()`
+### `deduped(lapply)(...)`
 
 `deduped()` can also be combined with `lapply()` or `purrr::map()`.
 
-```{r example-map}
+```{r example-lapply}
 
+set.seed(2)
 unique_list <- lapply(1:3, function(j) sample(LETTERS, j, replace = TRUE))
 str(unique_list)
 
@@ -90,6 +95,27 @@ length(duplicated_list)
 
 system.time({  y1 <- lapply(duplicated_list, slow_tolower)  })
 system.time({  y2 <- deduped(lapply)(duplicated_list, slow_tolower)  })
+
+all.equal(y1, y2)
+```
+
+### `deduped(fs::path_rel)(...)`
+
+`deduped()` is helpful on slow path functions like `fs::path_rel()`.
+
+```{r example-path_rel}
+
+set.seed(3)
+top_path <- "x/y/z/"
+unique_paths <- paste0(top_path, LETTERS, "/file.csv")
+str(unique_paths)
+
+# Create a list with significant duplication.
+dup_paths <- sample(rep(unique_paths, 500)) 
+length(dup_paths)
+
+system.time({  y1 <- fs::path_rel(dup_paths, start=top_path)  })
+system.time({  y2 <- deduped(fs::path_rel)(dup_paths, start=top_path)  })
 
 all.equal(y1, y2)
 ```

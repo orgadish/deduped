@@ -1,3 +1,16 @@
+# deduped 0.4.0
+* `deduped(f)(x)` (and `with_deduped`) check that the function maintains length
+  and error if not.
+  
+* `deduped(f)(x)` (and `with_deduped`) now maintain names and attributes (since 
+  we check that length is preserved). This includes functions that add attributes
+  like `fs::path()` where previously this dropped those. Added `fs::path_rel`
+  example to README.
+  
+* Changed to using `collapse::fmatch` and `base::match` in place of `fastmatch::fmatch` 
+  which as a side effect adds a hash attribute. Removed dependency on `fastmatch`.
+
+
 # deduped 0.3.0
 
 * New `with_deduped()` acts on an existing expression: this means you can attach

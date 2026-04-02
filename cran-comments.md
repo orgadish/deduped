@@ -1,3 +1,16 @@
+# Resubmission: deduped 0.4.0
+Updated helpers to properly maintain and handle attributes, including named vectors.
+Removed dependency on `fastmatch::fmatch` and replaced with `collapse::fmatch` which
+doesn't mutate the input as a side-effect. Added an error when a function changes the
+length.
+
+## R CMD check results
+
+── R CMD check results ────────────────────────────────────────────────── deduped 0.4.0 ────
+Duration: 59.5s
+
+0 errors ✔ | 0 warnings ✔ | 0 notes ✔
+
 # Resubmission: deduped 0.3.0
 Added new `with_deduped()` and allowed `deduped()` to pass incompatible inputs
 through as-is with a warning rather than an error.

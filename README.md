@@ -14,6 +14,8 @@ values of the input and expanding the results at the end. A convenience
 wrapper, `with_deduped()`, was added in version 0.3.0 to allow piping an
 existing expression.
 
+Note: It only works on functions that preserve length and order.
+
 ## Installation
 
 You can install the released version of `deduped` from
@@ -48,24 +50,27 @@ slow_tolower <- function(x) {
 }
 ```
 
-### `deduped()`
+### `deduped(...)`
 
 ``` r
 
 # Create a vector with significant duplication.
+set.seed(1)
 unique_vec <- sample(LETTERS, 5)
-duplicated_vec <- sample(rep(unique_vec, 50))
+print(unique_vec)
+#> [1] "Y" "D" "G" "A" "B"
+duplicated_vec <- sample(rep(unique_vec, 100))
 length(duplicated_vec)
-#> [1] 250
+#> [1] 500
 
 system.time({  x1 <- slow_tolower(duplicated_vec)  })
 #>    user  system elapsed 
-#>    0.00    0.00    3.88
+#>    0.02    0.02    5.97
 
 
 system.time({  x2 <- deduped(slow_tolower)(duplicated_vec)  })
 #>    user  system elapsed 
-#>    0.10    0.00    0.24
+#>    0.04    0.00    0.15
 all.equal(x1, x2)
 #> [1] TRUE
 ```
@@ -73,18 +78,19 @@ all.equal(x1, x2)
 *Note: As of version 0.3.0, you could also use*
 `slow_tolower(duplicated_vec) |> with_deduped()`.
 
-### `deduped(lapply)()`
+### `deduped(lapply)(...)`
 
 `deduped()` can also be combined with `lapply()` or `purrr::map()`.
 
 ``` r
 
+set.seed(2)
 unique_list <- lapply(1:3, function(j) sample(LETTERS, j, replace = TRUE))
 str(unique_list)
 #> List of 3
-#>  $ : chr "E"
-#>  $ : chr [1:2] "L" "O"
-#>  $ : chr [1:3] "N" "O" "Q"
+#>  $ : chr "U"
+#>  $ : chr [1:2] "O" "F"
+#>  $ : chr [1:3] "F" "H" "Q"
 
 # Create a list with significant duplication.
 duplicated_list <- sample(rep(unique_list, 50)) 
@@ -93,10 +99,38 @@ length(duplicated_list)
 
 system.time({  y1 <- lapply(duplicated_list, slow_tolower)  })
 #>    user  system elapsed 
-#>    0.03    0.00    4.68
+#>    0.04    0.00    3.58
 system.time({  y2 <- deduped(lapply)(duplicated_list, slow_tolower)  })
 #>    user  system elapsed 
 #>    0.00    0.00    0.09
+
+all.equal(y1, y2)
+#> [1] TRUE
+```
+
+### `deduped(fs::path_rel)(...)`
+
+`deduped()` is helpful on slow path functions like `fs::path_rel()`.
+
+``` r
+
+set.seed(3)
+top_path <- "x/y/z/"
+unique_paths <- paste0(top_path, LETTERS, "/file.csv")
+str(unique_paths)
+#>  chr [1:26] "x/y/z/A/file.csv" "x/y/z/B/file.csv" "x/y/z/C/file.csv" ...
+
+# Create a list with significant duplication.
+dup_paths <- sample(rep(unique_paths, 500)) 
+length(dup_paths)
+#> [1] 13000
+
+system.time({  y1 <- fs::path_rel(dup_paths, start=top_path)  })
+#>    user  system elapsed 
+#>    3.96    0.03    3.99
+system.time({  y2 <- deduped(fs::path_rel)(dup_paths, start=top_path)  })
+#>    user  system elapsed 
+#>    0.01    0.00    0.01
 
 all.equal(y1, y2)
 #> [1] TRUE

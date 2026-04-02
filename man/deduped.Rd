@@ -7,7 +7,8 @@
 deduped(f)
 }
 \arguments{
-\item{f}{A function that accepts a vector or list as its first input.}
+\item{f}{A length-preserving, order-preserving function that accepts a vector
+or list as its first input.}
 }
 \value{
 Deduplicated version of \code{f}.
@@ -16,6 +17,8 @@ Deduplicated version of \code{f}.
 Converts a vectorized function into one that only performs the computations
 on unique values in the first argument. The result is then expanded so that
 it is the same as if the computation was performed on all elements.
+
+Note: This only works with functions that preserve length and order.
 }
 \examples{
 

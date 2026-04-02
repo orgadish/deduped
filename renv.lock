@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.5.1",
+    "Version": "4.5.2",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -88,23 +88,6 @@
       "NeedsCompilation": "yes",
       "Author": "Sebastian Krantz [aut, cre] (ORCID: <https://orcid.org/0000-0001-6212-5229>), Matt Dowle [ctb], Arun Srinivasan [ctb], Morgan Jacob [ctb], Dirk Eddelbuettel [ctb], Laurent Berge [ctb], Kevin Tappe [ctb], Alina Cherkas [ctb], R Core Team and contributors worldwide [ctb], Martyn Plummer [cph], 1999-2016 The R Core Team [cph]",
       "Maintainer": "Sebastian Krantz <sebastian.krantz@graduateinstitute.ch>",
-      "Repository": "CRAN"
-    },
-    "fastmatch": {
-      "Package": "fastmatch",
-      "Version": "1.1-6",
-      "Source": "Repository",
-      "Title": "Fast 'match()' Function",
-      "Author": "Simon Urbanek [aut, cre, cph] (https://urbanek.org, <https://orcid.org/0000-0003-2297-1732>)",
-      "Authors@R": "person(\"Simon\", \"Urbanek\", role=c(\"aut\",\"cre\",\"cph\"), email=\"Simon.Urbanek@r-project.org\", comment=c(\"https://urbanek.org\", ORCID=\"0000-0003-2297-1732\"))",
-      "Maintainer": "Simon Urbanek <simon.urbanek@r-project.org>",
-      "Description": "Package providing a fast match() replacement for cases that require repeated look-ups. It is slightly faster that R's built-in match() function on first match against a table, but extremely fast on any subsequent lookup as it keeps the hash table in memory.",
-      "License": "GPL-2",
-      "Depends": [
-        "R (>= 2.3.0)"
-      ],
-      "URL": "http://www.rforge.net/fastmatch",
-      "NeedsCompilation": "yes",
       "Repository": "CRAN"
     },
     "renv": {
