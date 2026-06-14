@@ -137,3 +137,25 @@ for (x in list_of_vecs) deduped_slow_tolower(x)
 # Avoid: wrapper is rebuilt on every iteration
 for (x in list_of_vecs) slow_tolower(x) |> with_deduped()
 ```
+
+### `deduped(..., verbose = TRUE)`
+
+For benchmarking or debugging, pass `verbose = TRUE` to see the reduction 
+achieved.
+
+```{r example-verbose}
+head(
+  deduped(slow_tolower, verbose = TRUE)(duplicated_vec)
+)
+
+# Also available in `with_deduped()`:
+head(
+  slow_tolower(duplicated_vec) |> with_deduped(verbose = TRUE)
+)
+
+# Use `options(deduped.verbose)` to enable for the entire session.
+options(deduped.verbose = TRUE)
+head(
+  deduped(slow_tolower)(duplicated_vec)
+)
+```

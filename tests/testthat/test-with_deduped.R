@@ -83,3 +83,11 @@ test_that("with_deduped resolves variables in the calling environment", {
   x <- c("a", "b", "a")
   expect_identical(make_result(x), paste0(x, "_test"))
 })
+
+test_that("with_deduped respects verbose argument", {
+  x <- c("A", "B", "A", "A")
+  expect_message(
+    tolower(x) |> with_deduped(verbose = TRUE),
+    regexp = "4 value\\(s\\) reduced to 2 unique"
+  )
+})

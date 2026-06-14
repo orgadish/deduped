@@ -28,6 +28,10 @@
 #' @param expr The expression to evaluate.
 #' @param env The environment within which to evaluate the expression. Can be
 #'  modified when calling inside other functions.
+#' @param verbose If `TRUE`, prints the number of unique values and reduction
+#'  percentage on each call. If `NULL` (default), reads
+#'  `getOption("deduped.verbose", FALSE)` at call time, so setting
+#'  `options(deduped.verbose = TRUE)` enables it for the entire session.
 #'
 #' @returns The result of evaluating the expression.
 #' @export
@@ -60,7 +64,7 @@
 #' })
 #'
 #' all(y1 == y2)
-with_deduped <- function(expr, env = parent.frame()) {
+with_deduped <- function(expr, env = parent.frame(), verbose = NULL) {
   call_tree <- substitute(expr)
   if (!is.call(call_tree))
     stop("`expr` must be a function call expression, e.g. `f(x) |> with_deduped()`.")
@@ -96,6 +100,6 @@ with_deduped <- function(expr, env = parent.frame()) {
   # Evaluate the target data in the USER'S environment
   target_data <- eval(result$target, envir = env)
 
-  # Optimization Logic
-  deduped(f_wrapper)(target_data)
+  # Actual deduplication
+  deduped(f_wrapper, verbose = verbose)(target_data)
 }

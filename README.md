@@ -65,12 +65,12 @@ length(duplicated_vec)
 
 system.time({  x1 <- slow_tolower(duplicated_vec)  })
 #>    user  system elapsed 
-#>    0.07    0.01    6.50
+#>    0.02    0.00    6.73
 
 
 system.time({  x2 <- deduped(slow_tolower)(duplicated_vec)  })
 #>    user  system elapsed 
-#>    0.09    0.00    0.85
+#>    0.08    0.00    0.17
 all.equal(x1, x2)
 #> [1] TRUE
 
@@ -100,7 +100,7 @@ length(duplicated_list)
 
 system.time({  y1 <- lapply(duplicated_list, slow_tolower)  })
 #>    user  system elapsed 
-#>    0.00    0.00    3.69
+#>    0.03    0.00    3.90
 system.time({  y2 <- deduped(lapply)(duplicated_list, slow_tolower)  })
 #>    user  system elapsed 
 #>    0.00    0.00    0.09
@@ -128,10 +128,10 @@ length(dup_paths)
 
 system.time({  y1 <- fs::path_rel(dup_paths, start=top_path)  })
 #>    user  system elapsed 
-#>    4.00    0.02    4.11
+#>    6.16    0.05    6.35
 system.time({  y2 <- deduped(fs::path_rel)(dup_paths, start=top_path)  })
 #>    user  system elapsed 
-#>    0.00    0.00    0.02
+#>    0.01    0.00    0.01
 
 all.equal(y1, y2)
 #> [1] TRUE
@@ -150,4 +150,32 @@ for (x in list_of_vecs) deduped_slow_tolower(x)
 
 # Avoid: wrapper is rebuilt on every iteration
 for (x in list_of_vecs) slow_tolower(x) |> with_deduped()
+```
+
+### `deduped(..., verbose = TRUE)`
+
+For benchmarking or debugging, pass `verbose = TRUE` to see the
+reduction achieved.
+
+``` r
+head(
+  deduped(slow_tolower, verbose = TRUE)(duplicated_vec)
+)
+#> deduped: 500 value(s) reduced to 5 unique (99.0% reduction).
+#> [1] "y" "a" "b" "y" "d" "d"
+
+# Also available in `with_deduped()`:
+head(
+  slow_tolower(duplicated_vec) |> with_deduped(verbose = TRUE)
+)
+#> deduped: 500 value(s) reduced to 5 unique (99.0% reduction).
+#> [1] "y" "a" "b" "y" "d" "d"
+
+# Use `options(deduped.verbose)` to enable for the entire session.
+options(deduped.verbose = TRUE)
+head(
+  deduped(slow_tolower)(duplicated_vec)
+)
+#> deduped: 500 value(s) reduced to 5 unique (99.0% reduction).
+#> [1] "y" "a" "b" "y" "d" "d"
 ```

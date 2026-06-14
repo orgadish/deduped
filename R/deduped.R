@@ -8,15 +8,18 @@
 #' Note: This only works with functions that preserve length and order.
 #'
 #' @details
-#' Names are taken from the input `x` rather than from `f`'s output on the
-#' unique values, since `funique`/`unique` may drop names before `f` is called.
-#' This means input names are always preserved when present, but renaming by
-#' `f` (e.g. `setNames(x, paste0("out_", x))`) will be silently ignored.
-#' If `f` renames its output, call it directly rather than wrapping with
-#' `deduped()`.
+#' We make a best effort to preserve the two main cases for named inputs:
+#' 1. If `f()` drops names, names are dropped in the output.
+#' 2. Otherwise, we preserve the names from the input `x`.
+#' We cannot reliably re-expand the names from the deduped output, since
+#' duplicate values would always map back to their first occurrence's name.
 #'
 #' @param f A length-preserving, order-preserving function that accepts a vector
 #'  or list as its first input.
+#' @param verbose If `TRUE`, prints the number of unique values and reduction
+#'  percentage on each call. If `NULL` (default), reads
+#'  `getOption("deduped.verbose", FALSE)` at call time, so setting
+#'  `options(deduped.verbose = TRUE)` enables it for the entire session.
 #'
 #' @return Deduplicated version of `f`.
 #' @export
@@ -45,11 +48,19 @@
 #' })
 #'
 #' all(y1 == y2)
-deduped <- function(f) {
+deduped <- function(f, verbose = NULL) {
   # Ensure f is a function.
   f <- match.fun(f)
 
   function(x, ...) {
+    # Resolve verbose at runtime of the function, not when deduped() is first
+    # called: explicit argument to deduped() takes priority,
+    # otherwise check the session option, otherwise default to FALSE.
+    .verbose <- if (!is.null(verbose)) {
+      verbose
+    } else {
+      getOption("deduped.verbose", default = FALSE)
+    }
 
     # collapse::funique() and collapse::fmatch() are faster than the base
     # equivalents, but behave differently on lists.
@@ -78,16 +89,25 @@ deduped <- function(f) {
     # If x is trivially short, skip deduplication overhead.
     # Check after the if/else above to prevent data.frames with one column from
     # exiting without a warning.
-    if (length(x) <= 1L)
+    if (length(x) <= 1L) {
+      if (isTRUE(.verbose))
+        message("deduped: input has 1 or fewer elements, called f(x) directly.")
       return(f(x, ...))
+    }
 
     ux <- unique_fn(x)
 
     # If there is no duplication, avoid the re-expansion overhead by calling
     # on the original values to minimize the case where `ux` is any different,
     # e.g. if attributes changed.
-    if(length(ux) == length(x))
+    if (length(ux) == length(x)) {
+      if (isTRUE(.verbose))
+        message("deduped: no duplication found, called f(x) directly.")
       return(f(x, ...))
+    }
+
+    # Since unique may drop names, restore first-occurrence names
+    names(ux) <- names(x)[match_fn(ux, x)]  # Note: Different match than below
 
     uf <- f(ux, ...)
 
@@ -104,16 +124,26 @@ deduped <- function(f) {
 
 
     # Restore attributes from uf (what f produced), which covers whole-vector
-    # attributes like `class` and `levels`. For names, we use x's original names
-    # if x was named — we don't infer from uf's names since funique/unique may
-    # drop them. Position-based renaming by f is incompatible with deduplication
-    # regardless, since f is called on unique values only. Custom per-element
-    # attributes from third-party packages can't be handled generically here —
-    # if f produces any, they will reflect only the unique values rather than
-    # the full expanded output.
+    # attributes like `class` and `levels`. Custom per-element attributes from
+    # third-party packages can't be handled generically here — if f produces
+    # any, they will reflect only the unique values rather than the full
+    # expanded output.
     attrs <- attributes(uf)
-    attrs$names <- if (!is.null(names(x))) names(x) else NULL
+
+    # For names: since we restore names to ux before calling f, names(uf)
+    # correctly reflects whether f preserves names. If f drops names we drop
+    # them too; otherwise we use x's original names since match-based
+    # re-expansion is unreliable for duplicate values.
+    attrs$names <- if (!is.null(names(uf))) names(x) else NULL
+
     attributes(out) <- attrs
+
+    if (isTRUE(.verbose)) {
+      message(sprintf(
+        "deduped: %d value(s) reduced to %d unique (%.1f%% reduction).",
+        length(x), length(ux), 100 * (1 - length(ux) / length(x))
+      ))
+    }
 
     out
   }

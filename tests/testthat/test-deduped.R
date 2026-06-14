@@ -51,8 +51,8 @@ test_that("deduped(f) returns the data in the same order", {
   expect_equal(deduped(pass_through)(x), x)
 })
 
-test_that("deduped(f) works on lists", {
-  x <- list("ABC", "ABC")
+test_that("deduped(f) works on unnamed lists", {
+  x <- list("ABC", "DEF", "ABC")
   expect_equal(
     deduped(tolower)(x),
     tolower(x)
@@ -77,6 +77,15 @@ test_that("deduped(f) preserves names on named lists", {
   expect_identical(
     deduped(list_tolower)(x),
     list_tolower(x)
+  )
+})
+
+test_that("deduped(f) drops names on named lists when f drops names", {
+  # tolower() does not preserve names on lists.
+  x <- list(p = "ABC", q = "DEF", p = "ABC")
+  expect_identical(
+    deduped(tolower)(x),
+    tolower(x)
   )
 })
 
@@ -109,6 +118,7 @@ test_that("deduped(f) preserves non-name attributes on x", {
   )
 })
 
+
 test_that("deduped(f) warns on matrices or data frames", {
   pass_through <- \(i) i
 
@@ -125,5 +135,49 @@ test_that("deduped(f) fails on functions that change length", {
   # Note: No error if the input has no duplication, due to early exit path.
   expect_no_error(
     deduped(min)(1:10)
+  )
+})
+
+test_that("deduped(f, verbose=TRUE) prints reduction info", {
+  x <- c("A", "B", "A", "A")
+  expect_message(
+    deduped(tolower, verbose = TRUE)(x),
+    regexp = "4 value\\(s\\) reduced to 2 unique"
+  )
+})
+
+test_that("deduped(f) respects deduped.verbose option", {
+  x <- c("A", "B", "A", "A")
+  withr::with_options(
+    list(deduped.verbose = TRUE),
+    expect_message(
+      deduped(tolower)(x),
+      regexp = "4 value\\(s\\) reduced to 2 unique"
+    )
+  )
+})
+
+test_that("deduped(f, verbose=FALSE) suppresses messages even when option is TRUE", {
+  x <- c("A", "B", "A", "A")
+  withr::with_options(
+    list(deduped.verbose = TRUE),
+    expect_no_message(
+      deduped(tolower, verbose = FALSE)(x)
+    )
+  )
+})
+
+test_that("deduped(f, verbose=TRUE) messages on all early exit paths", {
+  expect_message(
+    deduped(tolower, verbose = TRUE)(character(0)),
+    regexp = "1 or fewer elements"
+  )
+  expect_message(
+    deduped(tolower, verbose = TRUE)("A"),
+    regexp = "1 or fewer elements"
+  )
+  expect_message(
+    deduped(tolower, verbose = TRUE)(c("A", "B", "C")),
+    regexp = "no duplication found"
   )
 })
