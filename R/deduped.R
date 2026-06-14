@@ -8,12 +8,12 @@
 #' Note: This only works with functions that preserve length and order.
 #'
 #' @details
-#' Names are taken from the input `x` rather than re-expanded from `f`'s output
-#' on the unique values. This means value-based renaming (e.g.
-#' `setNames(x, paste0("out_", x))`) is preserved correctly, but position-based
-#' renaming (e.g. `setNames(x, seq_along(x))`) will produce incorrect results
-#' since `f` is called on the unique values only. If `f` renames by position,
-#' call it directly rather than wrapping with `deduped()`.
+#' Names are taken from the input `x` rather than from `f`'s output on the
+#' unique values, since `funique`/`unique` may drop names before `f` is called.
+#' This means input names are always preserved when present, but renaming by
+#' `f` (e.g. `setNames(x, paste0("out_", x))`) will be silently ignored.
+#' If `f` renames its output, call it directly rather than wrapping with
+#' `deduped()`.
 #'
 #' @param f A length-preserving, order-preserving function that accepts a vector
 #'  or list as its first input.
@@ -51,10 +51,6 @@ deduped <- function(f) {
 
   function(x, ...) {
 
-    # If x is trivially short, skip deduplication overhead.
-    if (length(x) <= 1L)
-      return(f(x, ...))
-
     # collapse::funique() and collapse::fmatch() are faster than the base
     # equivalents, but behave differently on lists.
     if (inherits(x, "list")) {
@@ -78,6 +74,12 @@ deduped <- function(f) {
       )
       return(f(x, ...))
     }
+
+    # If x is trivially short, skip deduplication overhead.
+    # Check after the if/else above to prevent data.frames with one column from
+    # exiting without a warning.
+    if (length(x) <= 1L)
+      return(f(x, ...))
 
     ux <- unique_fn(x)
 
@@ -103,14 +105,14 @@ deduped <- function(f) {
 
     # Restore attributes from uf (what f produced), which covers whole-vector
     # attributes like `class` and `levels`. For names, we use x's original names
-    # rather than re-expanding uf's names: most functions either preserve or drop
-    # names, and position-based renaming is incompatible with deduplication
-    # regardless (f is called on unique values, so position-based names would be
-    # wrong either way). Custom per-element attributes from third-party packages
-    # can't be handled generically here — if f produces any, they will reflect
-    # only the unique values rather than the full expanded output.
+    # if x was named — we don't infer from uf's names since funique/unique may
+    # drop them. Position-based renaming by f is incompatible with deduplication
+    # regardless, since f is called on unique values only. Custom per-element
+    # attributes from third-party packages can't be handled generically here —
+    # if f produces any, they will reflect only the unique values rather than
+    # the full expanded output.
     attrs <- attributes(uf)
-    attrs$names <- names(x)
+    attrs$names <- if (!is.null(names(x))) names(x) else NULL
     attributes(out) <- attrs
 
     out

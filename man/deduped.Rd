@@ -21,12 +21,12 @@ it is the same as if the computation was performed on all elements.
 Note: This only works with functions that preserve length and order.
 }
 \details{
-Names are taken from the input \code{x} rather than re-expanded from \code{f}'s output
-on the unique values. This means value-based renaming (e.g.
-\code{setNames(x, paste0("out_", x))}) is preserved correctly, but position-based
-renaming (e.g. \code{setNames(x, seq_along(x))}) will produce incorrect results
-since \code{f} is called on the unique values only. If \code{f} renames by position,
-call it directly rather than wrapping with \code{deduped()}.
+Names are taken from the input \code{x} rather than from \code{f}'s output on the
+unique values, since \code{funique}/\code{unique} may drop names before \code{f} is called.
+This means input names are always preserved when present, but renaming by
+\code{f} (e.g. \code{setNames(x, paste0("out_", x))}) will be silently ignored.
+If \code{f} renames its output, call it directly rather than wrapping with
+\code{deduped()}.
 }
 \examples{
 
