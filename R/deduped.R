@@ -7,6 +7,13 @@
 #'
 #' Note: This only works with functions that preserve length and order.
 #'
+#' @details
+#' Names are taken from the input `x` rather than re-expanded from `f`'s output
+#' on the unique values. This means value-based renaming (e.g.
+#' `setNames(x, paste0("out_", x))`) is preserved correctly, but position-based
+#' renaming (e.g. `setNames(x, seq_along(x))`) will produce incorrect results
+#' since `f` is called on the unique values only. If `f` renames by position,
+#' call it directly rather than wrapping with `deduped()`.
 #'
 #' @param f A length-preserving, order-preserving function that accepts a vector
 #'  or list as its first input.
@@ -95,18 +102,15 @@ deduped <- function(f) {
 
 
     # Restore attributes from uf (what f produced), which covers whole-vector
-    # attributes like `class` and `levels`. The one per-element attribute we
-    # know about is `names`, which must be re-expanded to match the full output
-    # rather than taken directly from uf (which only has names for unique values).
-    # Custom per-element attributes from third-party packages can't be handled
-    # generically here — if f produces any, they will reflect only the unique
-    # values rather than the full expanded output.
+    # attributes like `class` and `levels`. For names, we use x's original names
+    # rather than re-expanding uf's names: most functions either preserve or drop
+    # names, and position-based renaming is incompatible with deduplication
+    # regardless (f is called on unique values, so position-based names would be
+    # wrong either way). Custom per-element attributes from third-party packages
+    # can't be handled generically here — if f produces any, they will reflect
+    # only the unique values rather than the full expanded output.
     attrs <- attributes(uf)
-    attrs$names <- if (!is.null(names(uf))) {
-      names(uf)[match_fn(x, ux)]  # re-expand per-element names
-    } else {
-      names(x)                     # f didn't name its output; keep input names
-    }
+    attrs$names <- names(x)
     attributes(out) <- attrs
 
     out
