@@ -4,13 +4,18 @@
 \alias{with_deduped}
 \title{Deduplicate the first argument in an expression}
 \usage{
-with_deduped(expr, env = parent.frame())
+with_deduped(expr, env = parent.frame(), verbose = NULL)
 }
 \arguments{
 \item{expr}{The expression to evaluate.}
 
 \item{env}{The environment within which to evaluate the expression. Can be
 modified when calling inside other functions.}
+
+\item{verbose}{If \code{TRUE}, prints the number of unique values and reduction
+percentage on each call. If \code{NULL} (default), reads
+\code{getOption("deduped.verbose", FALSE)} at call time, so setting
+\code{options(deduped.verbose = TRUE)} enables it for the entire session.}
 }
 \value{
 The result of evaluating the expression.

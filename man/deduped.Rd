@@ -4,11 +4,16 @@
 \alias{deduped}
 \title{Deduplicate a vectorized function to act on \emph{unique} elements}
 \usage{
-deduped(f)
+deduped(f, verbose = NULL)
 }
 \arguments{
 \item{f}{A length-preserving, order-preserving function that accepts a vector
 or list as its first input.}
+
+\item{verbose}{If \code{TRUE}, prints the number of unique values and reduction
+percentage on each call. If \code{NULL} (default), reads
+\code{getOption("deduped.verbose", FALSE)} at call time, so setting
+\code{options(deduped.verbose = TRUE)} enables it for the entire session.}
 }
 \value{
 Deduplicated version of \code{f}.
@@ -21,12 +26,13 @@ it is the same as if the computation was performed on all elements.
 Note: This only works with functions that preserve length and order.
 }
 \details{
-Names are taken from the input \code{x} rather than from \code{f}'s output on the
-unique values, since \code{funique}/\code{unique} may drop names before \code{f} is called.
-This means input names are always preserved when present, but renaming by
-\code{f} (e.g. \code{setNames(x, paste0("out_", x))}) will be silently ignored.
-If \code{f} renames its output, call it directly rather than wrapping with
-\code{deduped()}.
+We make a best effort to preserve the two main cases for named inputs:
+\enumerate{
+\item If \code{f()} drops names, names are dropped in the output.
+\item Otherwise, we preserve the names from the input \code{x}.
+We cannot reliably re-expand the names from the deduped output, since
+duplicate values would always map back to their first occurrence's name.
+}
 }
 \examples{
 
