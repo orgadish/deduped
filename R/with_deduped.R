@@ -11,6 +11,19 @@
 #' * With nesting: `f(g(x, g2), f2) |> with_deduped()` is equivalent to
 #'    `deduped(\(.z) f(g(.z, g2), f2))(x)`.
 #'
+#' @details
+#' `with_deduped()` reconstructs the wrapper function on every call, so it is
+#' best suited for one-off or interactive use. For repeated calls such as inside
+#' a loop, build the wrapper once with [deduped()] instead:
+#'
+#' ``` r
+#' # Preferred for loops:
+#' deduped_f <- deduped(slow_func)
+#' for (...) deduped_f(x)
+#'
+#' # Rather than:
+#' for (...) slow_func(x) |> with_deduped()
+#' ```
 #'
 #' @param expr The expression to evaluate.
 #' @param env The environment within which to evaluate the expression. Can be

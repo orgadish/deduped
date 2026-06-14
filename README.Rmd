@@ -76,8 +76,11 @@ system.time({  x1 <- slow_tolower(duplicated_vec)  })
 
 system.time({  x2 <- deduped(slow_tolower)(duplicated_vec)  })
 all.equal(x1, x2)
+
+# As of version 0.3.0, you can use `with_deduped()`.
+all.equal(x1, slow_tolower(duplicated_vec) |> with_deduped())
 ```
-_Note: As of version 0.3.0, you could also use_ `slow_tolower(duplicated_vec) |> with_deduped()`.
+
 
 ### `deduped(lapply)(...)`
 
@@ -118,4 +121,19 @@ system.time({  y1 <- fs::path_rel(dup_paths, start=top_path)  })
 system.time({  y2 <- deduped(fs::path_rel)(dup_paths, start=top_path)  })
 
 all.equal(y1, y2)
+```
+
+### When to use `with_deduped()`
+
+`with_deduped()` is a convenience wrapper for interactive or one-off use.
+Because it reconstructs the wrapper function on every call, prefer `deduped()`
+directly when calling inside a loop:
+
+```r
+# Good: wrapper is built once
+deduped_slow_tolower <- deduped(slow_tolower)
+for (x in list_of_vecs) deduped_slow_tolower(x)
+
+# Avoid: wrapper is rebuilt on every iteration
+for (x in list_of_vecs) slow_tolower(x) |> with_deduped()
 ```
