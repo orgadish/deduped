@@ -27,6 +27,19 @@ itself a function call.
 \verb{deduped(\\(.z) f(g(.z, g2), f2))(x)}.
 }
 }
+\details{
+\code{with_deduped()} reconstructs the wrapper function on every call, so it is
+best suited for one-off or interactive use. For repeated calls such as inside
+a loop, build the wrapper once with \code{\link[=deduped]{deduped()}} instead:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{# Preferred for loops:
+deduped_f <- deduped(slow_func)
+for (...) deduped_f(x)
+
+# Rather than:
+for (...) slow_func(x) |> with_deduped()
+}\if{html}{\out{</div>}}
+}
 \examples{
 
 x <- sample(LETTERS, 10)
