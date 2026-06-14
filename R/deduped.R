@@ -94,9 +94,19 @@ deduped <- function(f) {
     out <- uf[match_fn(x, ux)]
 
 
-    # Since we ensure length is the same, keep attributes.
-    attrs <- c(attributes(uf), attributes(x))  # Put uf first to keep those.
-    attrs <- attrs[!duplicated(names(attrs))]
+    # Restore attributes from uf (what f produced), which covers whole-vector
+    # attributes like `class` and `levels`. The one per-element attribute we
+    # know about is `names`, which must be re-expanded to match the full output
+    # rather than taken directly from uf (which only has names for unique values).
+    # Custom per-element attributes from third-party packages can't be handled
+    # generically here — if f produces any, they will reflect only the unique
+    # values rather than the full expanded output.
+    attrs <- attributes(uf)
+    attrs$names <- if (!is.null(names(uf))) {
+      names(uf)[match_fn(x, ux)]  # re-expand per-element names
+    } else {
+      names(x)                     # f didn't name its output; keep input names
+    }
     attributes(out) <- attrs
 
     out
