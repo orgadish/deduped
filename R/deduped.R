@@ -51,7 +51,7 @@ deduped <- function(f) {
     # collapse::funique() and collapse::fmatch() are faster than the base
     # equivalents, but behave differently on lists.
     if (inherits(x, "list")) {
-      ux <- unique(x)
+      unique_fn <- unique
       match_fn <- match
     }
 
@@ -59,7 +59,7 @@ deduped <- function(f) {
     # too restrictive since it fails on a vector with attributes. Instead we
     # just exclude matrices and arrays.
     else if (is.atomic(x) && is.null(dim(x))) {
-      ux <- collapse::funique(x)
+      unique_fn <- collapse::funique
       match_fn <- collapse::fmatch
     }
 
@@ -72,6 +72,7 @@ deduped <- function(f) {
       return(f(x, ...))
     }
 
+    ux <- unique_fn(x)
 
     # If there is no duplication, avoid the re-expansion overhead by calling
     # on the original values to minimize the case where `ux` is any different,
