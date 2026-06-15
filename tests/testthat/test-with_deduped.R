@@ -37,8 +37,8 @@ test_that("with_deduped(f(x, y)) is the same as deduped(f)(x, y) (int)", {
 
   # Named arguments
   expect_equal(
-    deduped(increment_by_n)(x, n=inc),
-    expect_no_warning(increment_by_n(x, n=inc) |> with_deduped())
+    deduped(increment_by_n)(x, n = inc),
+    expect_no_warning(increment_by_n(x, n = inc) |> with_deduped())
   )
 })
 
@@ -47,5 +47,47 @@ test_that("with_deduped(f(x, y)) is the same as deduped(f)(x, y) (char)", {
   expect_equal(
     deduped(paste0)(x, "X"),
     expect_no_warning(paste0(x, "X") |> with_deduped())
+  )
+})
+
+test_that("with_deduped errors on non-call expressions", {
+  x <- c("A", "A", "B")
+  expect_error(
+    with_deduped(x),
+    regexp = "must be a function call"
+  )
+})
+
+test_that("with_deduped errors on calls with no first argument", {
+  expect_error(
+    with_deduped(f()),
+    regexp = "has no first argument"
+  )
+})
+
+test_that("with_deduped works with nested calls", {
+  x <- c("a ", " b", "a ")
+  # with_deduped should deduplicate on the innermost first argument
+  expect_identical(
+    trimws(tolower(x)) |> with_deduped(),
+    trimws(tolower(x))
+  )
+})
+
+test_that("with_deduped resolves variables in the calling environment", {
+  make_result <- function(x) {
+    suffix <- "_test"
+    paste0(x, suffix) |> with_deduped()
+  }
+
+  x <- c("a", "b", "a")
+  expect_identical(make_result(x), paste0(x, "_test"))
+})
+
+test_that("with_deduped respects verbose argument", {
+  x <- c("A", "B", "A", "A")
+  expect_message(
+    tolower(x) |> with_deduped(verbose = TRUE),
+    regexp = "4 value\\(s\\) reduced to 2 unique"
   )
 })

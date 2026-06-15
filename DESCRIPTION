@@ -1,7 +1,7 @@
 Package: deduped
 Type: Package
 Title: Making "Deduplicated" Functions
-Version: 0.4.0
+Version: 0.5.0
 Authors@R:
     person("Or", "Gadish", email = "orgadish@gmail.com", role = c("aut", "cre", "cph"))
 Description: Contains one main function deduped() which speeds up slow,
@@ -12,9 +12,7 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     collapse,
-RoxygenNote: 7.3.3
 Suggests: 
-    purrr,
     testthat (>= 3.0.0),
     withr,
     fs
@@ -22,3 +20,4 @@ Config/testthat/edition: 3
 URL: https://github.com/orgadish/deduped
 BugReports: https://github.com/orgadish/deduped/issues
 Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.0.0

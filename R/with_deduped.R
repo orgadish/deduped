@@ -11,10 +11,27 @@
 #' * With nesting: `f(g(x, g2), f2) |> with_deduped()` is equivalent to
 #'    `deduped(\(.z) f(g(.z, g2), f2))(x)`.
 #'
+#' @details
+#' `with_deduped()` reconstructs the wrapper function on every call, so it is
+#' best suited for one-off or interactive use. For repeated calls such as inside
+#' a loop, build the wrapper once with [deduped()] instead:
+#'
+#' ``` r
+#' # Preferred for loops:
+#' deduped_f <- deduped(slow_func)
+#' for (...) deduped_f(x)
+#'
+#' # Rather than:
+#' for (...) slow_func(x) |> with_deduped()
+#' ```
 #'
 #' @param expr The expression to evaluate.
 #' @param env The environment within which to evaluate the expression. Can be
 #'  modified when calling inside other functions.
+#' @param verbose If `TRUE`, prints the number of unique values and reduction
+#'  percentage on each call. If `NULL` (default), reads
+#'  `getOption("deduped.verbose", FALSE)` at call time, so setting
+#'  `options(deduped.verbose = TRUE)` enables it for the entire session.
 #'
 #' @returns The result of evaluating the expression.
 #' @export
@@ -47,32 +64,42 @@
 #' })
 #'
 #' all(y1 == y2)
-with_deduped <- function(expr, env = parent.frame()) {
+with_deduped <- function(expr, env = parent.frame(), verbose = NULL) {
   call_tree <- substitute(expr)
-  find_env <- new.env()
-  find_env$target_expr <- NULL
+  if (!is.call(call_tree))
+    stop("`expr` must be a function call expression, e.g. `f(x) |> with_deduped()`.")
 
-  # Recursive walker (same as before)
+  # Recursively walks the call tree, replacing the deepest first argument with
+  # `.x`. Returns list(node = modified_call, target = original_leaf_expression).
   swap_arg <- function(node) {
-    if (is.call(node)) {
-      node[[2]] <- swap_arg(node[[2]])
-      return(node)
-    } else {
-      find_env$target_expr <- node
-      return(quote(.x))
-    }
+    # Base case: node is a literal or symbol (not a call), so this is the
+    # deepest first argument — the data to deduplicate. Return it as the target.
+    if (!is.call(node))
+      return(list(node = quote(.x), target = node))
+
+    # Guard: a call with no first argument (e.g. f()) has nothing to deduplicate.
+    if (length(node) < 2)
+      stop(sprintf(
+        "`%s` has no first argument to deduplicate.",
+        deparse(node[[1]])
+      ))
+
+    # Recursive case: descend into the first argument and splice the result back.
+    result <- swap_arg(node[[2]])
+    node[[2]] <- result$node
+    list(node = node, target = result$target)
   }
 
-  new_body <- swap_arg(call_tree)
+  result <- swap_arg(call_tree)
 
   f_wrapper <- function(.x) {}
-  body(f_wrapper) <- new_body
+  body(f_wrapper) <- result$node
   # Set environment to the USER'S environment, passed in as 'env'
   environment(f_wrapper) <- env
 
   # Evaluate the target data in the USER'S environment
-  target_data <- eval(find_env$target_expr, envir = env)
+  target_data <- eval(result$target, envir = env)
 
-  # Optimization Logic
-  deduped(f_wrapper)(target_data)
+  # Actual deduplication
+  deduped(f_wrapper, verbose = verbose)(target_data)
 }

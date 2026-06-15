@@ -4,11 +4,16 @@
 \alias{deduped}
 \title{Deduplicate a vectorized function to act on \emph{unique} elements}
 \usage{
-deduped(f)
+deduped(f, verbose = NULL)
 }
 \arguments{
 \item{f}{A length-preserving, order-preserving function that accepts a vector
 or list as its first input.}
+
+\item{verbose}{If \code{TRUE}, prints the number of unique values and reduction
+percentage on each call. If \code{NULL} (default), reads
+\code{getOption("deduped.verbose", FALSE)} at call time, so setting
+\code{options(deduped.verbose = TRUE)} enables it for the entire session.}
 }
 \value{
 Deduplicated version of \code{f}.
@@ -19,6 +24,15 @@ on unique values in the first argument. The result is then expanded so that
 it is the same as if the computation was performed on all elements.
 
 Note: This only works with functions that preserve length and order.
+}
+\details{
+We make a best effort to preserve the two main cases for named inputs:
+\enumerate{
+\item If \code{f()} drops names, names are dropped in the output.
+\item Otherwise, we preserve the names from the input \code{x}.
+We cannot reliably re-expand the names from the deduped output, since
+duplicate values would always map back to their first occurrence's name.
+}
 }
 \examples{
 

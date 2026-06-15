@@ -4,13 +4,18 @@
 \alias{with_deduped}
 \title{Deduplicate the first argument in an expression}
 \usage{
-with_deduped(expr, env = parent.frame())
+with_deduped(expr, env = parent.frame(), verbose = NULL)
 }
 \arguments{
 \item{expr}{The expression to evaluate.}
 
 \item{env}{The environment within which to evaluate the expression. Can be
 modified when calling inside other functions.}
+
+\item{verbose}{If \code{TRUE}, prints the number of unique values and reduction
+percentage on each call. If \code{NULL} (default), reads
+\code{getOption("deduped.verbose", FALSE)} at call time, so setting
+\code{options(deduped.verbose = TRUE)} enables it for the entire session.}
 }
 \value{
 The result of evaluating the expression.
@@ -26,6 +31,19 @@ itself a function call.
 \item With nesting: \code{f(g(x, g2), f2) |> with_deduped()} is equivalent to
 \verb{deduped(\\(.z) f(g(.z, g2), f2))(x)}.
 }
+}
+\details{
+\code{with_deduped()} reconstructs the wrapper function on every call, so it is
+best suited for one-off or interactive use. For repeated calls such as inside
+a loop, build the wrapper once with \code{\link[=deduped]{deduped()}} instead:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{# Preferred for loops:
+deduped_f <- deduped(slow_func)
+for (...) deduped_f(x)
+
+# Rather than:
+for (...) slow_func(x) |> with_deduped()
+}\if{html}{\out{</div>}}
 }
 \examples{
 
