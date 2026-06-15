@@ -1,3 +1,26 @@
+# deduped 0.5.0
+
+## Features
+* `deduped()` and `with_deduped()` gain a new `verbose` argument which adds
+ informative deduplication messaging if TRUE, either by passing the argument or
+ setting the new global `options(deduped.verbose = TRUE)`.
+* `deduped()` now has early exits for inputs of length <= 1 or when no 
+ duplication is found.
+ 
+## Bug Fixes
+* `deduped()` now drops names if `f()` drops names, but keeps input names
+ otherwise. Previously it always kept input names (#5).
+
+## Deletion of deduped_map()
+* `deduped_map()` has now been completely deleted and the "Suggests" dependence 
+ on purr has been removed. The function was deprecated with a warning in 
+ 0.2.0 and has no documented usage on github or cran.
+ 
+## Minor updates
+* Added checks in `with_deduped()` for malformed inputs (e.g. not a call tree,
+ or a call with no first argument to deduplicate.)
+
+
 # deduped 0.4.0
 * `deduped(f)(x)` (and `with_deduped`) check that the function maintains length
   and error if not.
